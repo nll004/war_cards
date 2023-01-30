@@ -1,10 +1,9 @@
 CREATE TABLE users (
     username VARCHAR(25) PRIMARY KEY,
     password TEXT NOT NULL,
-    email TEXT NOT NULL,
+    email TEXT NOT NULL UNIQUE,
     first_name TEXT NOT NULL,
-    last_name TEXT NOT NULL,
-    game_img TEXT
+    last_name TEXT NOT NULL
 );
 
 CREATE TABLE game_stats (

@@ -4,7 +4,9 @@
   "description": "Springboard software engineering bootcamp - Cohort Jan 2022 Project started Jan 2023",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js",
+    "test": "jest -i",
+    "dev": "nodemon server.js"
   },
   "repository": {
     "type": "git",
@@ -17,7 +19,12 @@
   },
   "homepage": "https://github.com/nll004/war_cards#readme",
   "dependencies": {
+    "axios": "^1.2.6",
+    "bcrypt": "^5.1.0",
     "express": "^4.18.2",
     "pg": "^8.9.0"
+  },
+  "devDependencies": {
+    "jest": "^29.4.1"
   }
 }
