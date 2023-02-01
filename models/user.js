@@ -19,6 +19,12 @@ async function checkIfUsernameOrEmailExists(username, email) {
 /** Related functions for users. */
 
 class User {
+    constructor({username, firstName, lastName, email}){
+        this.username = username;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+    };
 
     /** Registers a new user and returns user data and JWT
      *
@@ -26,9 +32,8 @@ class User {
      * @returns {object} - {username, firstName, lastName, email, token}
     */
     static async register({username, password, firstName, lastName, email}){
-        const lowerCasedUsername = username.toLowerCase();
         try {
-            await checkIfUsernameOrEmailExists(lowerCasedUsername, email);
+            await checkIfUsernameOrEmailExists(username, email);
             const hashedPassword = await bcrypt.hash(password, BCRYPT_WORK_FACTOR);
 
             const result = await db.query(`
@@ -37,8 +42,8 @@ class User {
                                 VALUES ($1, $2, $3, $4, $5)
                                 RETURNING
                                     username, password, first_name AS "firstName", last_name AS "lastName", email`,
-                                [lowerCasedUsername, hashedPassword, firstName, lastName, email]);
-            return result.rows[0];
+                                [username, hashedPassword, firstName, lastName, email]);
+            return new User(result.rows[0])
         }
         catch (errors) {
             throw new Error(errors.message); // pass error up to route

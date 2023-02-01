@@ -1,0 +1,58 @@
+{
+    "$schema": "https://json-schema.org/draft/2019-09/schema",
+    "$id": "http://war_cards/jsonSchemas/example.json",
+    "type": "object",
+    "default": {},
+    "title": "Register new user schema",
+    "required": [
+        "username",
+        "password",
+        "firstName",
+        "lastName",
+        "email"
+    ],
+    "properties": {
+        "username": {
+            "type": "string",
+            "default": "",
+            "examples": [
+                "newUser20384"
+            ]
+        },
+        "password": {
+            "type": "string",
+            "default": "",
+            "examples": [
+                "password123"
+            ]
+        },
+        "firstName": {
+            "type": "string",
+            "default": "",
+            "examples": [
+                "UserFirstname"
+            ]
+        },
+        "lastName": {
+            "type": "string",
+            "default": "",
+            "examples": [
+                "UserLastname"
+            ]
+        },
+        "email": {
+            "type": "string",
+            "default": "",
+            "examples": [
+                "newUserEmail@gmail.com"
+            ]
+        }
+    },
+    "examples": [{
+        "username": "newUser20384",
+        "password": "password",
+        "firstName": "new",
+        "lastName": "user",
+        "email": "newUserEmail@gmail.com"
+    }]
+}

@@ -1,26 +1,32 @@
 "use strict";
-
+const jsonschema = require('jsonschema');
+const jwt = require('jsonwebtoken');
 const express = require("express");
 const app = express();
+
+const {SECRET_KEY, JWT_OPTIONS} = require('./config');
+const registerUserSchema = require('./jsonSchemas/registerUser.json')
 const {User} = require('./models/user');
 
 // Parse request bodies for JSON
 app.use(express.json());
 
 /** Route for registering new users */
-app.post('/users', async function(req, res){
-    // need JSON schema to validate json body content
-    // all usernames should be lowercased?
-
-    const userData = req.body;
-    console.debug('POST /users --> Request body', userData);
-
-    try{
-        const user = await User.register(userData);
-        return res.status(200).send(user);
-    }catch(error){
-        console.error(error);
-        return res.status(400).send(error.message);
+app.post('/users', async function(req, res, next){
+    try {
+        const validator = jsonschema.validate(req.body, registerUserSchema);
+        if (!validator.valid) {
+          const errs = validator.errors.map(e => e.stack);
+          throw new Error(errs);
+        };
+        const newUser = await User.register(req.body);
+        const payload = {username: newUser.username};
+        const token = jwt.sign(payload, SECRET_KEY, JWT_OPTIONS);
+        return res.status(201).send({ user: newUser, _token: token });
+    }
+    catch (error){
+        res.status(400).send({ error: error.message });
+        return next(error);
     };
 });
 

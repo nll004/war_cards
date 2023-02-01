@@ -18,12 +18,19 @@ For a final capstone project I needed to incorporate an external API and create 
 - Axios
 
 ### Scripts
-To run server use:
+To start server use:
 ```js
 npm start
 ```
 
-To run server for development use:
+To start server for development use:
 ```js
 npm run dev
+```
+
+To run tests:
+```js
+npm test      // run all tests
+npm test fileName.test.js  // test specific file
+
 ```
