@@ -1,0 +1,25 @@
+{
+    "$schema": "https://json-schema.org/draft/2019-09/schema",
+    "$id": "http://war_cards/jsonSchemas/loginUser.json",
+    "type": "object",
+    "default": {},
+    "title": "User login schema",
+    "required": [
+        "username",
+        "password"
+    ],
+    "properties": {
+        "username": {
+            "type": "string",
+            "default": ""
+        },
+        "password": {
+            "type": "string",
+            "default": ""
+        }
+    },
+    "examples": [{
+        "username": "testUser204",
+        "password": "password1234"
+    }]
+}

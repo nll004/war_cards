@@ -17,7 +17,19 @@ For a final capstone project I needed to incorporate an external API and create 
 - Bcrypt
 - Axios
 
-### Scripts
+
+## API Routes
+    POST /user/register
+**Requires:** {username, password, firstName, lastName, email}
+
+**Returns:** { user: { username, firstName, lastName, email }, _token } or { error }
+
+    POST /user/login
+**Requires:** {username, password}
+
+**Returns:** { user: { username, firstName, lastName, email }, _token } or { error }
+
+## Scripts
 To start server use:
 ```js
 npm start
@@ -32,5 +44,4 @@ To run tests:
 ```js
 npm test      // run all tests
 npm test fileName.test.js  // test specific file
-
 ```

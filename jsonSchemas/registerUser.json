@@ -1,6 +1,6 @@
 {
     "$schema": "https://json-schema.org/draft/2019-09/schema",
-    "$id": "http://war_cards/jsonSchemas/example.json",
+    "$id": "http://war_cards/jsonSchemas/registerUser.json",
     "type": "object",
     "default": {},
     "title": "Register new user schema",

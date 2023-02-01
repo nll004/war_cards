@@ -3,10 +3,10 @@
 const {db, BCRYPT_WORK_FACTOR} = require("../db");
 const bcrypt = require("bcrypt");
 
-/** Returns true if either the username or email already exists in the database
+/** Returns error if either the username or email already exists in the database
  *
- * @param username {string} - lowercased username
- * @param email {string} - validated email address
+ * @param username {string} - username
+ * @param email {string} - full email address
 */
 async function checkIfUsernameOrEmailExists(username, email) {
     const res = await db.query(`SELECT username, email
@@ -19,17 +19,11 @@ async function checkIfUsernameOrEmailExists(username, email) {
 /** Related functions for users. */
 
 class User {
-    constructor({username, firstName, lastName, email}){
-        this.username = username;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-    };
 
-    /** Registers a new user and returns user data and JWT
+    /** Registers user. Hashes pwd then returns user data (minus password)
      *
      * @param userData {object} - {username, firstName, lastName, email, password}
-     * @returns {object} - {username, firstName, lastName, email, token}
+     * @returns {object} - {username:, firstName:, lastName:, email:}
     */
     static async register({username, password, firstName, lastName, email}){
         try {
@@ -41,14 +35,49 @@ class User {
                                     (username, password, first_name, last_name, email)
                                 VALUES ($1, $2, $3, $4, $5)
                                 RETURNING
-                                    username, password, first_name AS "firstName", last_name AS "lastName", email`,
+                                    username, first_name AS "firstName", last_name AS "lastName", email`,
                                 [username, hashedPassword, firstName, lastName, email]);
-            return new User(result.rows[0])
+            return result.rows[0]
         }
         catch (errors) {
             throw new Error(errors.message); // pass error up to route
         }
     };
+
+    /** Retrieve user's data with password if user exists. Otherwise returns Error.
+     *
+     * @param username {string}
+     * @returns {object} { username, firstName, lastName, email } vs Error if not found
+    */
+    static async get(username) {
+        const result = await db.query(`
+                            SELECT  username,
+                                    password,
+                                    first_name AS "firstName",
+                                    last_name AS "lastName",
+                                    email
+                            FROM users
+                            WHERE username = $1`,
+                            [username]);
+        if (result.rows.length === 0) throw new Error('User not found');
+        return result.rows[0]
+    };
+
+    static async login(username, password){
+        try {
+            const user = await User.get(username);
+            const validPassword = await bcrypt.compare(password, user.password);
+
+            if(validPassword === true) {
+                delete user.password; // removing password before returning user
+                return user
+            }
+            else throw new Error('Incorrect username/password');
+        }
+        catch (errors){
+            throw new Error(errors.message); // pass up to route
+        }
+    }
 }
 
 module.exports = {
