@@ -3,7 +3,8 @@ CREATE TABLE users (
     password TEXT NOT NULL,
     email TEXT NOT NULL UNIQUE,
     first_name TEXT NOT NULL,
-    last_name TEXT NOT NULL
+    last_name TEXT NOT NULL,
+    isAdmin BOOLEAN DEFAULT false
 );
 
 CREATE TABLE game_stats (

@@ -1,6 +1,6 @@
 "use strict";
 
-const {User} = require('../models/user');
+const {User} = require('./user');
 const {seedTestDB, commonAfterAll} = require('../testSetup');
 
 beforeAll(()=> console.log('UserModel tests BeforeAll ->', 'NODE_ENV ->', process.env.NODE_ENV));

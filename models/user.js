@@ -2,6 +2,7 @@
 
 const {db, BCRYPT_WORK_FACTOR} = require("../db");
 const bcrypt = require("bcrypt");
+const { BadRequestError, NotFoundError } = require("../expressErrors");
 
 /** Returns error if either the username or email already exists in the database
  *
@@ -13,7 +14,7 @@ async function checkIfUsernameOrEmailExists(username, email) {
                                 FROM users
                                 WHERE username = $1 OR email = $2`,
                                 [username, email]);
-    if(res.rows.length > 0) throw new Error('Username/email already exists');
+    if(res.rows.length > 0) throw new BadRequestError('Username/email already exists');
 };
 
 /** Related functions for users. */
@@ -40,7 +41,7 @@ class User {
             return result.rows[0]
         }
         catch (errors) {
-            throw new Error(errors.message); // pass error up to route
+            throw new BadRequestError(errors.message); // pass error up to route
         }
     };
 
@@ -59,7 +60,7 @@ class User {
                             FROM users
                             WHERE username = $1`,
                             [username]);
-        if (result.rows.length === 0) throw new Error('User not found');
+        if (result.rows.length === 0) throw new NotFoundError('User not found');
         return result.rows[0]
     };
 
@@ -72,10 +73,10 @@ class User {
                 delete user.password; // removing password before returning user
                 return user
             }
-            else throw new Error('Incorrect username/password');
+            else throw new BadRequestError('Incorrect username/password');
         }
         catch (errors){
-            throw new Error(errors.message); // pass up to route
+            throw new BadRequestError(errors.message); // pass up to route
         }
     }
 }

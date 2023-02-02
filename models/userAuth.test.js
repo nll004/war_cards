@@ -1,6 +1,6 @@
 "use strict";
 
-const {User, checkIfUsernameOrEmailExists} = require('../models/user');
+const {User, checkIfUsernameOrEmailExists} = require('./user');
 const {seedTestDB, commonAfterAll} = require('../testSetup');
 
 beforeAll(()=> {
