@@ -16,77 +16,39 @@ const { UnauthorizedError } = require("../expressErrors");
 
 function authenticateJWT(req, res, next) {
     try {
-      const authHeader = req.headers && req.headers.authorization;
-      const currentTime = Math.floor(Date.now() / 1000);
+        const authHeader = req.headers && req.headers.authorization;
+        const currentTime = Math.floor(Date.now() / 1000);
 
-      if (authHeader) {
-        const token = authHeader.replace(/^[Bb]earer /, "").trim();
-        const verifiedUser = jwt.verify(token, SECRET_KEY);
-        if (verifiedUser.exp < currentTime) {
-            throw new UnauthorizedError('Login credentials have expired. Please log in again');
+        if (authHeader) {
+            const token = authHeader.replace(/^[Bb]earer /, "").trim();
+            res.locals.user = jwt.verify(token, SECRET_KEY);
         }
-        res.locals.user = verifiedUser;
-      }
-      return next();
+        return next();
     } catch (err) {
-      return next();
+        return next();
     }
-  };
+};
 
-  /** Middleware to ensure a user must be logged in.
-   *
-   * If not, raises Error.
-   */
+/** Middleware to ensure a user must be logged in.
+ *
+ * If not, raises Error.
+ */
 
-  function ensureLoggedIn(req, res, next) {
-    console.log('EnsureLoggedIn', res.locals.user)
+function ensureLoggedIn(req, res, next) {
     try {
-      if (!res.locals.user) throw new UnauthorizedError();
-      return next();
+        if (!res.locals.user) throw new UnauthorizedError();
+
+        const currentTime = Math.floor(Date.now() / 1000);
+        if (res.locals.user.exp < currentTime) {
+            throw new UnauthorizedError('Login credentials have expired. Please log in again');
+        };
+        return next();
     } catch (err) {
-      return next(err);
+        return next(err);
     }
-  };
+};
 
-
-  /** Middleware to use when they be logged in as an admin user.
-   *
-   *  If not, raises Unauthorized.
-   */
-
-  function ensureAdmin(req, res, next) {
-    try {
-      if (!res.locals.user || !res.locals.user.isAdmin) {
-        throw new UnauthorizedError();
-      }
-      return next();
-    } catch (err) {
-      return next(err);
-    }
-  };
-
-  /** Middleware to use when they must provide a valid token & be user matching
-   *  username provided as route param.
-   *
-   *  If not, raises Unauthorized.
-   */
-
-  function ensureCorrectUserOrAdmin(req, res, next) {
-    try {
-      const user = res.locals.user;
-      if (!(user && (user.isAdmin || user.username === req.params.username))) {
-        throw new UnauthorizedError();
-      }
-      return next();
-    } catch (err) {
-      return next(err);
-    }
-  };
-
-
-  module.exports = {
+module.exports = {
     authenticateJWT,
-    ensureLoggedIn,
-    ensureAdmin,
-    ensureCorrectUserOrAdmin,
-  };
+    ensureLoggedIn
+};
