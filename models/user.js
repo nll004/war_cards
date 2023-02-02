@@ -26,18 +26,18 @@ class User {
      * @param userData {object} - {username, firstName, lastName, email, password}
      * @returns {object} - {username:, firstName:, lastName:, email:}
     */
-    static async register({username, password, firstName, lastName, email}){
+    static async register({username, password, firstName, lastName, email, isAdmin=false}){
         try {
             await checkIfUsernameOrEmailExists(username, email);
             const hashedPassword = await bcrypt.hash(password, BCRYPT_WORK_FACTOR);
 
             const result = await db.query(`
                                 INSERT INTO users
-                                    (username, password, first_name, last_name, email)
-                                VALUES ($1, $2, $3, $4, $5)
+                                    (username, password, first_name, last_name, email, is_admin)
+                                VALUES ($1, $2, $3, $4, $5, $6)
                                 RETURNING
-                                    username, first_name AS "firstName", last_name AS "lastName", email`,
-                                [username, hashedPassword, firstName, lastName, email]);
+                                    username, first_name AS "firstName", last_name AS "lastName", email, is_admin AS "isAdmin"`,
+                                [username, hashedPassword, firstName, lastName, email, isAdmin]);
             return result.rows[0]
         }
         catch (errors) {
@@ -56,7 +56,8 @@ class User {
                                     password,
                                     first_name AS "firstName",
                                     last_name AS "lastName",
-                                    email
+                                    email,
+                                    is_admin AS "isAdmin"
                             FROM users
                             WHERE username = $1`,
                             [username]);
@@ -64,6 +65,11 @@ class User {
         return result.rows[0]
     };
 
+    /** Return user data (minus password) if username and password is correct.
+     *
+     * @returns {object} { username, firstName, lastName, email, isAdmin }
+     * Or Error if username/password is incorrect
+     */
     static async login(username, password){
         try {
             const user = await User.get(username);
@@ -78,8 +84,8 @@ class User {
         catch (errors){
             throw new BadRequestError(errors.message); // pass up to route
         }
-    }
-}
+    };
+};
 
 module.exports = {
     User,

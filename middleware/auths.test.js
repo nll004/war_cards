@@ -1,14 +1,18 @@
 "use strict";
 
 const jwt = require("jsonwebtoken");
-const { authenticateJWT, ensureLoggedIn} = require("./auths");
+const { authenticateJWT,
+        ensureLoggedIn,
+        ensureCorrectUserOrAdmin,
+        ensureAdmin}
+    = require("./auths");
 
 const { SECRET_KEY } = require("../config");
 const { UnauthorizedError } = require("../expressErrors");
 const testJwt = jwt.sign({ username: "test", isAdmin: false }, SECRET_KEY);
 const incorrectJWT = jwt.sign({ username: "test", isAdmin: false }, "wrong");
 
-describe("authenticateJWT", function () {
+describe("authenticateJWT middleware function", function () {
     it("should store user in locals with correct header and token", function () {
         expect.assertions(2);
         const req = { headers: { authorization: `Bearer ${testJwt}` } };
@@ -49,8 +53,7 @@ describe("authenticateJWT", function () {
     });
 });
 
-
-describe("ensureLoggedIn", function () {
+describe("ensureLoggedIn middleware function", function () {
     it("should not throw error if local user exists", function () {
         expect.assertions(1);
         const req = {};
@@ -82,5 +85,59 @@ describe("ensureLoggedIn", function () {
             expect(err instanceof UnauthorizedError).toBeTruthy();
         };
         ensureLoggedIn(req, res, next);
+    });
+});
+
+describe("ensureCorrectUserOrAdmin middleware function", function () {
+    it("should allow admin to proceed without throwing error", function () {
+        expect.assertions(1);
+        const req = { params: { username: "test" } };
+        const res = { locals: { user: { username: "admin", isAdmin: true } } };
+        const next = function (err) {
+            expect(err).toBeFalsy();
+        };
+        ensureCorrectUserOrAdmin(req, res, next);
+    });
+
+    it("should allow correct user to proceed without error", function () {
+        expect.assertions(1);
+        const req = { params: { username: "test" } };
+        const res = { locals: { user: { username: "test", isAdmin: false } } };
+        const next = function (err) {
+            expect(err).toBeFalsy();
+        };
+        ensureCorrectUserOrAdmin(req, res, next);
+    });
+
+    it("should throw error if incorrect user and not admin", function () {
+        expect.assertions(1);
+        const req = { params: { username: "wrong" } };
+        const res = { locals: { user: { username: "test", isAdmin: false } } };
+        const next = function (err) {
+            expect(err instanceof UnauthorizedError).toBeTruthy();
+        };
+        ensureCorrectUserOrAdmin(req, res, next);
+    });
+});
+
+describe("ensureAdmin middleware", function () {
+    it("should allow admin to proceed without error", function () {
+        expect.assertions(1);
+        const req = {};
+        const res = { locals: { user: { username: "test", isAdmin: true } } };
+        const next = function (err) {
+            expect(err).toBeFalsy();
+        };
+        ensureAdmin(req, res, next);
+    });
+
+    it("should throw error is not admin", function () {
+        expect.assertions(1);
+        const req = {};
+        const res = { locals: { user: { username: "test", isAdmin: false } } };
+        const next = function (err) {
+            expect(err instanceof UnauthorizedError).toBeTruthy();
+        };
+        ensureAdmin(req, res, next);
     });
 });

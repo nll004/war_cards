@@ -14,9 +14,10 @@ async function seedTestDB() {
 
     const hashedPassword = await bcrypt.hash('password', BCRYPT_WORK_FACTOR);
         // create a few test users
-    await db.query(`INSERT INTO users(username, password, email, first_name, last_name)
-                    VALUES ('testUser', '${hashedPassword}', 'testUser@gmail.com', 'test', 'user'),
-                           ('testUser2', '${hashedPassword}', 'testUser2@gmail.com', 'test', 'user')`
+    await db.query(`INSERT INTO users(username, password, email, first_name, last_name, is_admin)
+                    VALUES ('testUser', '${hashedPassword}', 'testUser@gmail.com', 'test', 'user', false),
+                           ('testUser2', '${hashedPassword}', 'testUser2@gmail.com', 'test', 'user', false),
+                           ('adminUser', '${hashedPassword}', 'admin@gmail.com', 'admin', 'user', true);`
                 );
 };
 
