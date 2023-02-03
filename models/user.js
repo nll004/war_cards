@@ -2,20 +2,8 @@
 
 const {db, BCRYPT_WORK_FACTOR} = require("../db");
 const bcrypt = require("bcrypt");
+const checkIfUsernameOrEmailExists = require('../helpers/checkSQL');
 const { BadRequestError, NotFoundError } = require("../expressErrors");
-
-/** Returns error if either the username or email already exists in the database
- *
- * @param username {string} - username
- * @param email {string} - full email address
-*/
-async function checkIfUsernameOrEmailExists(username, email) {
-    const res = await db.query(`SELECT username, email
-                                FROM users
-                                WHERE username = $1 OR email = $2`,
-                                [username, email]);
-    if(res.rows.length > 0) throw new BadRequestError('Username/email already exists');
-};
 
 /** Related functions for users. */
 
@@ -82,6 +70,22 @@ class User {
             else throw new BadRequestError('Incorrect username/password');
         }
         catch (errors){
+            throw new BadRequestError(errors.message); // pass up to route
+        }
+    };
+
+    /** Returns username if the given user was delete
+     *
+     *  If no user was deleted, returns an error.
+     */
+    static async delete(username){
+        try{
+            const deletedUser = await db.query(` DELETE FROM users
+                                                WHERE username=$1
+                                                RETURNING username`, [username]);
+            if (deletedUser.rows.length === 0) throw new Error('User not found');
+            return deletedUser.rows[0]
+        }catch(errors){
             throw new BadRequestError(errors.message); // pass up to route
         }
     };

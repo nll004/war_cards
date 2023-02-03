@@ -35,3 +35,24 @@ describe('User.get', function(){
         };
     });
 });
+
+// =============================== Delete User ======================================================
+
+describe('User.delete', function() {
+    it('should throw error if no user is found', async function () {
+        expect.assertions(2);
+        try {
+            await User.delete('nullUser');
+            fail();
+        } catch (err) {
+            expect(err instanceof Error).toBeTruthy();
+            expect(err.message).toEqual('User not found');
+        };
+    });
+
+    it('should return a username if deletion was successful', async function () {
+        expect.assertions(1);
+        const res = await User.delete('testUser');
+        expect(res).toEqual({username: 'testUser'});
+    });
+});

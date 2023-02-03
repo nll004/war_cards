@@ -1,11 +1,7 @@
 "use strict";
 
 const jwt = require("jsonwebtoken");
-const { authenticateJWT,
-        ensureLoggedIn,
-        ensureCorrectUserOrAdmin,
-        ensureAdmin}
-    = require("./auths");
+const { authenticateJWT, ensureLoggedIn, ensureCorrectUserOrAdmin, ensureAdmin} = require("./auths");
 
 const { SECRET_KEY } = require("../config");
 const { UnauthorizedError } = require("../expressErrors");

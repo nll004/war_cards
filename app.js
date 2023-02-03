@@ -68,6 +68,8 @@ app.post('/users/login', async function(req, res, next) {
  * Retrieve user data and user stats.
  *
  * Token is required for authentication and ensure user is logged in
+ *
+ * Admin can also get user data for users
  */
 app.get('/users/:username', ensureLoggedIn, ensureCorrectUserOrAdmin, async (req, res, next) => {
     try{
@@ -82,6 +84,21 @@ app.get('/users/:username', ensureLoggedIn, ensureCorrectUserOrAdmin, async (req
     }
 });
 
+/** Route for deleting user */
+
+app.delete('/users/:username', ensureLoggedIn, ensureCorrectUserOrAdmin, async (req, res, next) => {
+    try {
+        const { username } = req.params;
+        const deletedUser = await User.delete(username);
+
+        return res.status(200).send({success: true, deleted: deletedUser });
+    }
+    catch (error) {
+        console.error(error);
+        res.status(404).send("Failed to delete user");
+        return next(error);
+    };
+});
 
 /** Generic error handler; anything unhandled goes here. */
 app.use(function (err, req, res, next) {
