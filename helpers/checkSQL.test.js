@@ -13,7 +13,7 @@ describe('checkForExistingUsernameOrEmail helper function', function () {
     it('should throw Error if username already exists in database', async () => {
         expect.assertions(1);
         try {
-            await checkIfUsernameOrEmailExists('testUser', 'nonExistentEmail@gmail.com');
+            await checkIfUsernameOrEmailExists('nonExistentEmail@gmail.com', 'testUser');
             fail();
         } catch (err) {
             expect(err instanceof BadRequestError).toBeTruthy();
@@ -23,7 +23,7 @@ describe('checkForExistingUsernameOrEmail helper function', function () {
     it('should throw Error if email already exists in database', async () => {
         expect.assertions(1);
         try {
-            await checkIfUsernameOrEmailExists('nullUser', 'testUser@gmail.com');
+            await checkIfUsernameOrEmailExists('testUser@gmail.com', 'nullUser');
             fail();
         } catch (err) {
             expect(err instanceof BadRequestError).toBeTruthy();
@@ -32,7 +32,7 @@ describe('checkForExistingUsernameOrEmail helper function', function () {
 
     it('should return without throwing an error if username/email is not found', async () => {
         expect.assertions(1);
-        await expect(checkIfUsernameOrEmailExists('nullUser', 'nonExistentEmail@gmail.com'))
-            .resolves.toBe(undefined);
+        await expect(checkIfUsernameOrEmailExists('nonExistentEmail@gmail.com', 'nullUser'))
+            .resolves.toBe(false);
     });
 });

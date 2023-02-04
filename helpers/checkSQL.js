@@ -8,12 +8,13 @@ const { BadRequestError } = require("../expressErrors");
  * @param username {string} - username
  * @param email {string} - full email address
 */
-async function checkIfUsernameOrEmailExists(username, email) {
+async function checkIfUsernameOrEmailExists(email, username) {
     const res = await db.query(`SELECT username, email
                                 FROM users
-                                WHERE username = $1 OR email = $2`,
-        [username, email]);
+                                WHERE email = $1 OR username = $2`,
+        [email, username]);
     if (res.rows.length > 0) throw new BadRequestError('Username/email already exists');
+    return false
 };
 
 module.exports = checkIfUsernameOrEmailExists;

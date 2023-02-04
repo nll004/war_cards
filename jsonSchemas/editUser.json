@@ -1,0 +1,41 @@
+{
+    "$schema": "https://json-schema.org/draft/2019-09/schema",
+    "$id": "http://war_cards.com/jsonSchemas/editUser.json",
+    "type": "object",
+    "default": {},
+    "title": "Edit user schema",
+    "properties": {
+        "firstName": {
+            "type": "string"
+        },
+        "lastName": {
+            "type": "string"
+        },
+        "email": {
+            "type": "string",
+            "format": "email",
+            "examples": [
+                "email@gmail.com"
+            ]
+        },
+        "password": {
+            "type": "string"
+        },
+        "isAdmin": {
+            "type": "boolean"
+        },
+        "username": {
+            "type": "string"
+        }
+    },
+    "examples": [
+        {
+            "firstName": "",
+            "lastName": "",
+            "email": "email@gmail.com",
+            "password": "unhashedpwd",
+            "isAdmin": true
+        }
+    ],
+    "additionalProperties": false
+}
