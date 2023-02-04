@@ -5,10 +5,10 @@ DROP DATABASE war_cards;
 CREATE DATABASE war_cards;
 \connect war_cards
 
-\i war-schema.sql
+\i war_schema.sql
 
 DROP DATABASE war_cards_test;
 CREATE DATABASE war_cards_test;
 \connect war_cards_test
 
-\i war-schema.sql
+\i war_schema.sql
