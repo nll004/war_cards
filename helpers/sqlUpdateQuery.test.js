@@ -4,7 +4,8 @@ const {sqlUpdateQueryBuilder} = require('./sqlUpdateQuery');
 const { seedTestDB, commonAfterAll } = require('../testSetup');
 const { BadRequestError } = require('../expressErrors');
 
-beforeAll(seedTestDB);
+beforeAll(()=> console.log('SqlUpdateQueryBuilder helper tests', 'NODE_ENV ->', process.env.NODE_ENV));
+beforeEach(seedTestDB);
 afterAll(commonAfterAll);
 
 describe('sqlUpdateQueryBuilder', function(){
@@ -12,7 +13,6 @@ describe('sqlUpdateQueryBuilder', function(){
         expect.assertions(1);
         try{
             sqlUpdateQueryBuilder('users', undefined, {firstName: 'testUser'});
-            fail();
         }catch(e){
             expect(e instanceof BadRequestError).toBeTruthy();
         }
@@ -22,7 +22,6 @@ describe('sqlUpdateQueryBuilder', function(){
         expect.assertions(2);
         try{
             sqlUpdateQueryBuilder('users', 'testUser', {});
-            fail();
         }catch(e){
             expect(e instanceof BadRequestError).toBeTruthy();
             expect(e.message).toEqual('Cannot build query without tableName, username and data');

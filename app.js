@@ -130,6 +130,28 @@ app.patch('/users/:username', ensureLoggedIn, ensureCorrectUserOrAdmin, async fu
     }
 });
 
+/** GET /users/:username/stats
+ *
+ *  Route for retrieving game stats for specified user
+ *
+ *  Requires: logged in user
+ *
+ *  Only user's self or admin can retrieve stats.
+ *
+ *  Returns {status, game_stats} or Error
+ */
+app.get('/users/:username/stats', ensureLoggedIn, ensureCorrectUserOrAdmin, async function(req, res, next){
+    try{
+        const {username} = req.params;
+        const gameStats = await User.getGameStats(username);
+        return res.status(200).send({ success: true, game_stats: gameStats})
+    }catch(error){
+        console.log("route error", errors)
+        return next(error);
+    }
+});
+
+
 
 /** Generic error handler; anything unhandled goes here. */
 app.use(function (err, req, res, next) {

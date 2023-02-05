@@ -38,7 +38,6 @@ describe('User.register', function() {
         expect.assertions(1);
         try{
             await User.register(newUser); // repeat registering the newUser
-            fail();
         } catch(err){
             expect(err instanceof Error).toBeTruthy();
         };
@@ -52,7 +51,6 @@ describe('User.login', function(){
         expect.assertions(2);
         try{
             await User.login('nullUser', 'password');
-            fail();
         } catch(err) {
             expect(err instanceof BadRequestError).toBeTruthy();
             expect(err.message).toEqual('User not found');
@@ -63,7 +61,6 @@ describe('User.login', function(){
         expect.assertions(2);
         try{
             await User.login('testUser2', 'incorrectPwd');
-            fail();
         } catch(err) {
             expect(err instanceof BadRequestError).toBeTruthy();
             expect(err.message).toEqual('Incorrect username/password');

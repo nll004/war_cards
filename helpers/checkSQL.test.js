@@ -4,7 +4,8 @@ const checkIfUsernameOrEmailExists = require('./checkSQL');
 const { seedTestDB, commonAfterAll } = require('../testSetup');
 const { BadRequestError } = require('../expressErrors');
 
-beforeAll(seedTestDB);
+beforeAll(() => console.log('checkForExistingUsernameOrEmail helper tests ->', 'NODE_ENV ->', process.env.NODE_ENV));
+beforeEach(seedTestDB);
 afterAll(commonAfterAll);
 
 // ============== Check For Existing Username Or Email Helper Function ===========================
@@ -14,7 +15,6 @@ describe('checkForExistingUsernameOrEmail helper function', function () {
         expect.assertions(1);
         try {
             await checkIfUsernameOrEmailExists('nonExistentEmail@gmail.com', 'testUser');
-            fail();
         } catch (err) {
             expect(err instanceof BadRequestError).toBeTruthy();
         };
@@ -24,7 +24,6 @@ describe('checkForExistingUsernameOrEmail helper function', function () {
         expect.assertions(1);
         try {
             await checkIfUsernameOrEmailExists('testUser@gmail.com', 'nullUser');
-            fail();
         } catch (err) {
             expect(err instanceof BadRequestError).toBeTruthy();
         };

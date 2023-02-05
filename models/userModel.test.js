@@ -30,7 +30,6 @@ describe('User.get', function(){
         expect.assertions(2);
         try{
             await User.get('nullUser');
-            fail();
         } catch(err){
             expect(err instanceof Error).toBeTruthy();
             expect(err.message).toEqual('User not found');
@@ -45,7 +44,6 @@ describe('User.delete', function() {
         expect.assertions(2);
         try {
             await User.delete('nullUser');
-            fail();
         } catch (err) {
             expect(err instanceof Error).toBeTruthy();
             expect(err.message).toEqual('User not found');
@@ -66,7 +64,6 @@ describe('User.edit', function() {
         expect.assertions(2);
         try {
             await User.edit('nullUser');
-            fail();
         } catch (err) {
             expect(err instanceof Error).toBeTruthy();
             expect(err.message).toEqual('User not found');
@@ -77,7 +74,6 @@ describe('User.edit', function() {
         expect.assertions(2);
         try {
             await User.edit('testUser', {firstName: 'newName', email: 'admin@gmail.com'});
-            fail();
         } catch (err) {
             expect(err instanceof BadRequestError).toBeTruthy();
             expect(err.message).toEqual('Username/email already exists');
@@ -97,7 +93,7 @@ describe('User.edit', function() {
                                         isAdmin: true,
                                         password: expect.any(String)
                                     });
-    })
+    });
 
     it('should successfully change email if the email is unique', async function() {
         expect.assertions(1);

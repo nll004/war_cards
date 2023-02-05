@@ -8,6 +8,8 @@ const { UnauthorizedError } = require("../expressErrors");
 const testJwt = jwt.sign({ username: "test", isAdmin: false }, SECRET_KEY);
 const incorrectJWT = jwt.sign({ username: "test", isAdmin: false }, "wrong");
 
+console.log('AuthenticateJWT middleware tests ->', 'NODE_ENV ->', process.env.NODE_ENV);
+
 describe("authenticateJWT middleware function", function () {
     it("should store user in locals with correct header and token", function () {
         expect.assertions(2);

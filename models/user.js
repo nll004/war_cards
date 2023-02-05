@@ -27,6 +27,7 @@ class User {
                                 RETURNING
                                     username, first_name AS "firstName", last_name AS "lastName", email, admin AS "isAdmin"`,
                                 [username, hashedPassword, firstName, lastName, email, isAdmin]);
+            await User.initGameStats(username); // create game stats table row
             return result.rows[0]
         }
         catch (errors) {
@@ -92,7 +93,14 @@ class User {
         }
     };
 
-    /**  */
+    /** Updates user table. Returns username if data is successfully updated
+     *
+     * @param username {string} - case sensitive username
+     * @param dataToEdit {object} - key/value pairs of data to change
+     *      Ex: {email: 'newEmail@gmail.com', password: 'newPassword', ...}
+     *
+     * @returns {object} {username: 'testUser'} or Error
+    */
     static async edit(username, dataToEdit){
         const jsToSql = {
             firstName: 'first_name',
@@ -106,7 +114,7 @@ class User {
                 await checkIfUsernameOrEmailExists(dataToEdit.email);
             };
             if('password' in dataToEdit) {
-            //  hash new password if it in the data to be edited
+            //  hash new password before storing
                 const hashedPassword = await bcrypt.hash(dataToEdit.password, BCRYPT_WORK_FACTOR);
                 dataToEdit.password = hashedPassword;
             };
@@ -119,29 +127,42 @@ class User {
         };
     };
 
-    // get game stats
-
-    /**  */
-    static async editGameStats(username, dataToEdit){
-        const jsToSql = {
-            gamesPlayed: 'games_played',
-            gamesWon: 'games_won',
-            gamesLost: 'games_lost',
-            battles: 'battles',
-            battlesWon: 'battles_won',
-            battlesLost: 'battles_lost'
-        };
+    /** Creates a game_stats row for new players using default values of 0.
+     *
+     *  If the row fails to create, error is returned.
+    */
+    static async initGameStats(username){
         try{
-            await User.get(username);  // check for user or throw NotFoundError
-            // check for existing email?
-            // hash password
-
-            const result = await this.sqlQueryBuilder(tableName, username, dataToEdit, )
-
+            const result = await db.query(` INSERT INTO game_stats (username)
+                                        VALUES ($1)
+                                        RETURNING username;`, [username]);
+            if (result.rows.length === 0) throw new BadRequestError('Failed to create game_stats');
         }catch(errors){
             throw new BadRequestError(errors.message);
         }
-    }
+    };
+
+    /** Return game stats for specified user
+     *  @param username {string} - case sensitive username
+     *  @returns {object} - {username, gamesPlayed, gamesWon, gamesLost, battles, battlesWon, battlesLost}
+    */
+    static async getGameStats(username){
+        try{
+            await User.get(username); // check for user, if no user throw NotFoundError
+            const res = await db.query(`SELECT  username,
+                                                games_played AS "gamesPlayed",
+                                                games_won AS "gamesWon",
+                                                battles,
+                                                battles_won AS "battlesWon"
+                                        FROM game_stats
+                                        WHERE username = $1`, [username]);
+            if(res.rows.length === 0) throw new BadRequestError('Unable to retrieve game stats');
+            return res.rows[0]
+        }catch(errors){
+            throw new BadRequestError(errors.message);
+        }
+    };
+
 };
 
 module.exports = {

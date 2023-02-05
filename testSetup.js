@@ -6,7 +6,7 @@ const {db, BCRYPT_WORK_FACTOR} = require('./db');
 async function clearDB() {
     // clear user table before starting
     await db.query('DELETE FROM users');
-    await db.query('DELETE FROM game_stats')
+    await db.query('DELETE FROM game_stats');
 };
 
 async function seedTestDB() {
@@ -18,7 +18,13 @@ async function seedTestDB() {
                     VALUES ('testUser', '${hashedPassword}', 'testUser@gmail.com', 'test', 'user', false),
                            ('testUser2', '${hashedPassword}', 'testUser2@gmail.com', 'test', 'user', false),
                            ('adminUser', '${hashedPassword}', 'admin@gmail.com', 'admin', 'user', true);`
-                );
+    );
+        // create test values into game stats for users
+    await db.query(`INSERT INTO game_stats(username, games_played, games_won, battles, battles_won)
+                    VALUES ('testUser', 5, 3, 16, 10),
+                           ('testUser2', 9, 7, 22, 18),
+                           ('adminUser', 10, 1, 26, 4);`
+    );
 };
 
 async function commonAfterAll() {
