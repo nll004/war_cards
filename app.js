@@ -8,6 +8,7 @@ const {createToken} = require('./helpers/tokens');
 const registerUserSchema = require('./jsonSchemas/registerUser');
 const loginUserSchema = require('./jsonSchemas/loginUser.json');
 const editUserSchema = require('./jsonSchemas/editUser.json');
+const editUserStatsSchema = require('./jsonSchemas/editUserStats.json');
 const { authenticateJWT, ensureLoggedIn, ensureCorrectUserOrAdmin } = require('./middleware/auths');
 const { BadRequestError, UnauthorizedError } = require('./expressErrors');
 
@@ -144,14 +145,42 @@ app.get('/users/:username/stats', ensureLoggedIn, ensureCorrectUserOrAdmin, asyn
     try{
         const {username} = req.params;
         const gameStats = await User.getGameStats(username);
-        return res.status(200).send({ success: true, game_stats: gameStats})
+        return res.status(200).send({ success: true, gameStats: gameStats})
     }catch(error){
         console.log("route error", errors)
         return next(error);
     }
 });
 
+/** PATCH /users/:username/stats
+ *
+ *  Route for updating user stats
+ *
+ *  Requires: logged in user
+ *
+ *  Only user's self or admin can edit data.
+ *  Username and admin status is only able to be changed by admin
+*/
+app.patch('/users/:username/stats', ensureLoggedIn, ensureCorrectUserOrAdmin, async function (req, res, next) {
+    try {
+        const validator = jsonschema.validate(req.body, editUserStatsSchema);
+        if (!validator.valid || (req.body.battlesWon > req.body.battles)) throw new BadRequestError('Invalid JSON properties');
 
+        const { username } = req.params;
+        const existingStats = await User.getGameStats(username);
+        const newStats = req.body;
+
+        const adjustedStats = {};
+        for(let key in newStats) {
+            adjustedStats[key] = existingStats[key] + newStats[key];
+        };
+        const result = await User.editGameStats(username, adjustedStats);
+        return res.status(201).send({ success: true, modified: result });
+    }
+    catch (error) {
+        return next(error);
+    }
+});
 
 /** Generic error handler; anything unhandled goes here. */
 app.use(function (err, req, res, next) {

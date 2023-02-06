@@ -27,7 +27,7 @@ describe('User.initGameStats', function () {
 // ================================= Get Stats =========================================================
 
 describe('User.getGameStats', function(){
-    it('throws error if user is not valid', async function(){
+    it('throws error if user does not exist', async function(){
         expect.assertions(2);
         try{
             await User.getGameStats('null user');
@@ -58,5 +58,48 @@ describe('User.getGameStats', function(){
                                 battles: 16,
                                 battlesWon: 10
                             });
+    });
+});
+
+// ================================= Edit Stats =========================================================
+
+describe('User.editGameStats', function () {
+    it('should throw error if the given username is not found', async function () {
+        expect.assertions(2);
+        try {
+            await User.editGameStats('nullUser', { gamesPlayed: 1 });
+        } catch (err) {
+            expect(err instanceof Error).toBeTruthy();
+            expect(err.message).toEqual('User not found');
+        };
+    });
+
+    it('should throw error if edit was not successful', async function () {
+        // delete all game_stats so that User.getGameStats will return no rows
+        await db.query('DELETE FROM game_stats');
+        expect.assertions(2);
+        try {
+            await User.editGameStats('testUser', { gamesPlayed: 1 });
+        } catch (err) {
+            expect(err instanceof BadRequestError).toBeTruthy();
+            expect(err.message).toContain('Game stat update unsuccessful');
+        }
+    });
+
+    it('should return username once changes are successfully made', async function () {
+        const gameStats = {gamesPlayed: 1, gamesWon: 1, battles: 20, battlesWon: 16};
+
+        expect.assertions(2);
+        const res = await User.editGameStats('testUser', gameStats);
+        expect(res).toEqual({ username: 'testUser' });
+
+        // retrieve user to check stats
+        const userAfterEdit = await User.getGameStats('testUser');
+        expect(userAfterEdit).toEqual({ username: 'testUser',
+                                        gamesPlayed: 1,
+                                        gamesWon: 1,
+                                        battles: 20,
+                                        battlesWon: 16
+        });
     });
 });

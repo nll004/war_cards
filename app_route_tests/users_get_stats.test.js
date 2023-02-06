@@ -34,7 +34,7 @@ describe('GET /users/:username/stats', function () {
         const res2 = await request(app).get('/users/testUser/stats').set('authorization', `Bearer ${res.body._token}`);
         expect(res2.statusCode).toEqual(200);
         expect(res2.body).toEqual({ success: true,
-                                    game_stats: {
+                                    gameStats: {
                                             battles: 16,
                                             battlesWon: 10,
                                             gamesPlayed: 5,
@@ -68,7 +68,7 @@ describe('GET /users/:username/stats', function () {
         const res2 = await request(app).get('/users/testUser/stats').set('authorization', `Bearer ${res.body._token}`);
         expect(res2.statusCode).toEqual(200);
         expect(res2.body).toEqual({ success: true,
-                                    game_stats: {
+                                    gameStats: {
                                         battles: 16,
                                         battlesWon: 10,
                                         gamesPlayed: 5,

@@ -1,0 +1,42 @@
+{
+    "$schema": "https://json-schema.org/draft/2019-09/schema",
+    "$id": "http://war_cards.com/jsonSchemas/editUserStats.json",
+    "type": "object",
+    "default": {},
+    "title": "Update user stats schema",
+    "required": [
+        "gamesPlayed",
+        "gamesWon",
+        "battles",
+        "battlesWon"
+    ],
+    "properties": {
+        "gamesPlayed": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1
+        },
+        "gamesWon": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1
+        },
+        "battles": {
+            "type": "integer",
+            "minimum": 5
+        },
+        "battlesWon": {
+            "type": "integer",
+            "minimum": 0
+        }
+    },
+    "examples": [
+        {
+            "gamesPlayed": 1,
+            "gamesWon": 1,
+            "battles": 20,
+            "battlesWon": 14
+        }
+    ],
+    "additionalProperties": false
+}

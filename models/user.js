@@ -163,6 +163,28 @@ class User {
         }
     };
 
+    /** Edit game stats and return username if successful
+     *
+    */
+    static async editGameStats(username, dataToEdit){
+        const jsToSql = {
+            gamesPlayed: 'games_played',
+            gamesWon: 'games_won',
+            battles: 'battles',
+            battlesWon: 'battles_won'
+        };
+        try{
+            await User.get(username);  // check for user or throw NotFoundError
+
+            const { query, values } = sqlUpdateQueryBuilder('game_stats', username, dataToEdit, jsToSql);
+            const res = await db.query(query, values);
+            if(res.rowCount === 0) throw new BadRequestError('Game stat update unsuccessful');
+
+            return res.rows[0]
+        }catch(errors){
+            throw new BadRequestError(errors.message);
+        }
+    }
 };
 
 module.exports = {

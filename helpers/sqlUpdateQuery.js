@@ -21,7 +21,8 @@ const { BadRequestError } = require("../expressErrors");
 function sqlUpdateQueryBuilder(tableName, username, data, keysToUpdate) {
     if(!tableName || !username || !data || Object.keys(data).length === 0) {
         throw new BadRequestError('Cannot build query without tableName, username and data');
-    }
+    };
+
     const queryString = [`UPDATE ${tableName} SET`];
     const queryValues = [];
     let valueIndex = 1;
@@ -41,7 +42,7 @@ function sqlUpdateQueryBuilder(tableName, username, data, keysToUpdate) {
     queryValues.push(username);
 
     return {query: queryString.join(' '), values: queryValues}
-}
+};
 
 module.exports = {
     sqlUpdateQueryBuilder,
