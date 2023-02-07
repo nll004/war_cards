@@ -1,9 +1,9 @@
 "use strict";
+
 const { commonAfterAll, seedTestDB } = require('../testSetup');
 const request = require('supertest');
 const app = require('../app');
 
-// ======================  DELETE /user/:username Route ====================================================
 describe('DELETE /users/:username', function(){
     beforeAll(() => console.log('User delete route tests ->', 'NODE_ENV ->', process.env.NODE_ENV));
     beforeEach(seedTestDB);

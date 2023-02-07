@@ -1,4 +1,4 @@
-\echo "Delete and recreate user/stats db?"
+\echo "Delete and recreate user/game_stats db?"
 \prompt "Return for yes or control-C to cancel >" foo
 
 DROP DATABASE war_cards;

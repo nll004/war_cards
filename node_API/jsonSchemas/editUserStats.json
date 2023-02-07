@@ -23,7 +23,7 @@
         },
         "battles": {
             "type": "integer",
-            "minimum": 5
+            "minimum": 0
         },
         "battlesWon": {
             "type": "integer",

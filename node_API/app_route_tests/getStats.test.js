@@ -1,4 +1,5 @@
 "use strict";
+
 const { commonAfterAll, seedTestDB } = require('../testSetup');
 const request = require('supertest');
 const app = require('../app');
@@ -44,7 +45,7 @@ describe('GET /users/:username/stats', function () {
         });
     });
 
-    it('should not allow a non admin user to access other users stats', async function() {
+    it('should not allow a non admin user to access another users stats', async function() {
         expect.assertions(3);
         // get nonAdmin user token first
         const res = await request(app).post('/users/login')

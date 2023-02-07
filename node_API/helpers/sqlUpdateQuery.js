@@ -2,22 +2,19 @@
 
 const { BadRequestError } = require("../expressErrors");
 
-/**
- * Helper for making custom update queries.
+/** Builds sanitized custom update queries.
  *
- * @param tableName {string} - sql table name for query
- * @param username {string} - username to be used in WHERE clause
- * @param data {object} - <p> key/values to add to query. <p>
+ *  @param tableName {string} - sql table name for query
+ *  @param username {string} - username to be used in WHERE clause
+ *  @param data {object} - key/values to add to query
  *      Ex: { password: 'newPassword', firstName: 'newName', ...}
- * @param keysToUpdate {object} - optional. Keys that need to be changed from camel case to snake case for SQL.
+ *  @param keysToUpdate {object} - optional keys that need to be changed from camel case to snake case for SQL.
  *      Ex: { firstName: 'first_name', lastName = 'last_name'}
  *
- * @returns {object}
- * @example fn('users', 'usersName', {firstName: 'Aliya', age: 32}, {firstName: 'first_name'} =>
- *   { query: 'UPDATE users SET "first_name"=$1, "age"=$2 WHERE username = "usersName"',
+ *  @example fn('users', 'testUser', {firstName: 'Aliya', age: 32}, {firstName: 'first_name'} =>
+ *   { query: 'UPDATE users SET "first_name"=$1, "age"=$2 WHERE username = "testUser"',
  *     values: ['Aliya', 32] }
  */
-
 function sqlUpdateQueryBuilder(tableName, username, data, keysToUpdate) {
     if(!tableName || !username || !data || Object.keys(data).length === 0) {
         throw new BadRequestError('Cannot build query without tableName, username and data');
@@ -34,7 +31,7 @@ function sqlUpdateQueryBuilder(tableName, username, data, keysToUpdate) {
         }else{
             queryString.push(`"${key}" = $${valueIndex}`);
         }
-        if (valueIndex < Object.keys(data).length) queryString.push(',');
+        if (valueIndex < Object.keys(data).length) queryString.push(','); // add commas
         queryValues.push(value);
         valueIndex++;
     };
@@ -44,6 +41,4 @@ function sqlUpdateQueryBuilder(tableName, username, data, keysToUpdate) {
     return {query: queryString.join(' '), values: queryValues}
 };
 
-module.exports = {
-    sqlUpdateQueryBuilder,
-};
+module.exports = sqlUpdateQueryBuilder;

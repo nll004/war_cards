@@ -4,7 +4,7 @@ const bcrypt = require("bcrypt");
 const {db, BCRYPT_WORK_FACTOR} = require('./db');
 
 async function clearDB() {
-    // clear user table before starting
+    // clear user and game_stats tables
     await db.query('DELETE FROM users');
     await db.query('DELETE FROM game_stats');
 };
@@ -19,7 +19,7 @@ async function seedTestDB() {
                            ('testUser2', '${hashedPassword}', 'testUser2@gmail.com', 'test', 'user', false),
                            ('adminUser', '${hashedPassword}', 'admin@gmail.com', 'admin', 'user', true);`
     );
-        // create test values into game stats for users
+        // create test game stats for users
     await db.query(`INSERT INTO game_stats(username, games_played, games_won, battles, battles_won)
                     VALUES ('testUser', 5, 3, 16, 10),
                            ('testUser2', 9, 7, 22, 18),

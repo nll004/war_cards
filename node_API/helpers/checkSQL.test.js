@@ -12,20 +12,22 @@ afterAll(commonAfterAll);
 
 describe('checkForExistingUsernameOrEmail helper function', function () {
     it('should throw Error if username already exists in database', async () => {
-        expect.assertions(1);
+        expect.assertions(2);
         try {
             await checkIfUsernameOrEmailExists('nonExistentEmail@gmail.com', 'testUser');
         } catch (err) {
             expect(err instanceof BadRequestError).toBeTruthy();
+            expect(err.message).toEqual('Username/email already exists');
         };
     });
 
     it('should throw Error if email already exists in database', async () => {
-        expect.assertions(1);
+        expect.assertions(2);
         try {
             await checkIfUsernameOrEmailExists('testUser@gmail.com', 'nullUser');
         } catch (err) {
             expect(err instanceof BadRequestError).toBeTruthy();
+            expect(err.message).toEqual('Username/email already exists');
         };
     });
 

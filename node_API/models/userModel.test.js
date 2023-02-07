@@ -5,7 +5,7 @@ const {User} = require('./user');
 const {seedTestDB, commonAfterAll} = require('../testSetup');
 const { BadRequestError } = require('../expressErrors');
 
-beforeAll(()=> console.log('UserModel tests BeforeAll ->', 'NODE_ENV ->', process.env.NODE_ENV));
+beforeAll(()=> console.log('UserModel tests ->', 'NODE_ENV ->', process.env.NODE_ENV));
 beforeEach(seedTestDB);
 afterAll(commonAfterAll);
 
@@ -85,6 +85,7 @@ describe('User.edit', function() {
         const res = await User.edit('testUser', { firstName: 'newName', lastName: 'changedName', isAdmin: true });
         expect(res).toEqual({ username: 'testUser' });
 
+        // check user to make sure updates were made
         const userAfterEdit = await User.get('testUser');
         expect(userAfterEdit).toEqual({ username: 'testUser',
                                         email: 'testUser@gmail.com',
@@ -96,8 +97,11 @@ describe('User.edit', function() {
     });
 
     it('should successfully change email if the email is unique', async function() {
-        expect.assertions(1);
-        await User.edit('testUser', { email: 'newEmail@gmail.com' });
+        expect.assertions(2);
+        const res = await User.edit('testUser', { email: 'newEmail@gmail.com' });
+        expect(res).toEqual({ username: 'testUser' });
+
+        // check user to make sure updates were made
         const userAfterEdit = await User.get('testUser');
         expect(userAfterEdit).toEqual({ username: 'testUser',
                                         email: 'newEmail@gmail.com',

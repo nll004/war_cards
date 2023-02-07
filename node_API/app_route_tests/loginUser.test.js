@@ -1,10 +1,11 @@
 "use strict";
+
 const { commonAfterAll, seedTestDB } = require('../testSetup');
 const request = require('supertest');
 const app = require('../app');
 
 describe('POST /users/login', function () {
-    beforeAll(() => console.log('User login Route tests ->', 'NODE_ENV ->', process.env.NODE_ENV));
+    beforeAll(() => console.log('User login route tests ->', 'NODE_ENV ->', process.env.NODE_ENV));
     beforeEach(seedTestDB);
     afterAll(commonAfterAll);
 
@@ -31,7 +32,7 @@ describe('POST /users/login', function () {
         const res = await request(app).post('/users/login').send({ username: 'nullUser', password: "password" });
         expect(res.statusCode).toEqual(400);
         expect(res.body).toEqual({  error: {
-                                        message: "User not found",
+                                        message: "Incorrect username/password",
                                         status: 400
                                     }
         });

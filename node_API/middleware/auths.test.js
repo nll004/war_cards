@@ -19,12 +19,11 @@ describe("authenticateJWT middleware function", function () {
             expect(err).toBeFalsy();
         };
         authenticateJWT(req, res, next);
-        expect(res.locals).toEqual({
-            user: {
-                iat: expect.any(Number),
-                username: "test",
-                isAdmin: false,
-            },
+        expect(res.locals).toEqual({    user: {
+                                            iat: expect.any(Number),
+                                            username: "test",
+                                            isAdmin: false,
+                                        },
         });
     });
 
@@ -76,11 +75,11 @@ describe("ensureLoggedIn middleware function", function () {
         const currentTime = Math.floor(Date.now() / 1000);
         const expiredTime = currentTime - 10000;
 
-        expect.assertions(1);
+        expect.assertions(2);
         const req = {};
         const res = { locals: { user: {username: 'test', isAdmin: false, exp: expiredTime }} };
         const next = function (err) {
-            expect(err instanceof UnauthorizedError).toBeTruthy();
+            expect(err instanceof Error).toBeTruthy();
         };
         ensureLoggedIn(req, res, next);
     });

@@ -3,17 +3,18 @@
 const {db, BCRYPT_WORK_FACTOR} = require("../db");
 const bcrypt = require("bcrypt");
 const checkIfUsernameOrEmailExists = require('../helpers/checkSQL');
-const {sqlUpdateQueryBuilder} = require('../helpers/sqlUpdateQuery');
+const sqlUpdateQueryBuilder = require('../helpers/sqlUpdateQuery');
 const { BadRequestError, NotFoundError } = require("../expressErrors");
 
 /** Related functions for users. */
 
 class User {
 
-    /** Registers user. Hashes pwd then returns user data (minus password)
+    /** Registers new user with data.
+     *  Hashes password and inserts user into users table as well as inits game stats.
      *
-     * @param userData {object} - {username, firstName, lastName, email, password}
-     * @returns {object} - {username:, firstName:, lastName:, email:}
+     * @param userData {object} - { username, firstName, lastName, email, password, isAdmin* } - *optional
+     * @returns {object} - { username, firstName, lastName, email, isAdmin } - omits hashed password
     */
     static async register({username, password, firstName, lastName, email, isAdmin=false}){
         try {
@@ -27,7 +28,9 @@ class User {
                                 RETURNING
                                     username, first_name AS "firstName", last_name AS "lastName", email, admin AS "isAdmin"`,
                                 [username, hashedPassword, firstName, lastName, email, isAdmin]);
-            await User.initGameStats(username); // create game stats table row
+            // create game stats table row for new user with default values or throw error
+            await User.initGameStats(username);
+
             return result.rows[0]
         }
         catch (errors) {
@@ -35,10 +38,10 @@ class User {
         }
     };
 
-    /** Retrieve user's data with password if user exists. Otherwise returns Error.
+    /** Retrieve user's data (including password) if user exists.
      *
-     * @param username {string}
-     * @returns {object} { username, firstName, lastName, email } vs Error if not found
+     *  @param username {string} - case sensitive username
+     *  @returns {object} { username, firstName, lastName, email, isAdmin } vs NotFoundError
     */
     static async get(username) {
         const result = await db.query(`
@@ -51,55 +54,61 @@ class User {
                             FROM users
                             WHERE username = $1`,
                             [username]);
-        if (result.rows.length === 0) throw new NotFoundError('User not found');
+        if (result.rowCount === 0) throw new NotFoundError('User not found');
+
         return result.rows[0]
     };
 
-    /** Return user data (minus password) if username and password is correct.
+    /** Return user data (minus password) if correct username/password
      *
-     * @returns {object} { username, firstName, lastName, email, admin }
-     * Or Error if username/password is incorrect
+     *  @param username {string} - case sensitive username
+     *  @param password {string} - unhashed password
+     *
+     *  @returns {object} { username, firstName, lastName, email, isAdmin } vs Error
      */
     static async login(username, password){
         try {
-            const user = await User.get(username);
+            const user = await User.get(username); // find user data and hashed pwd
             const validPassword = await bcrypt.compare(password, user.password);
 
             if(validPassword === true) {
                 delete user.password; // removing password before returning user
                 return user
             }
-            else throw new BadRequestError('Incorrect username/password');
+            else throw new BadRequestError();
         }
         catch (errors){
-            throw new BadRequestError(errors.message); // pass up to route
+            throw new BadRequestError('Incorrect username/password'); // pass up to route
         }
     };
 
-    /** Returns username if the given user was successfully delete
-     *  @param username {string} - case sensitive username
+    /** Deletes specified user
      *
-     *  If no user was deleted, returns an error.
+     *  @param username {string} - case sensitive username
+     *  @returns {object} -  { username: "user's name" } or error if failed
      */
     static async delete(username){
         try{
             const deletedUser = await db.query(` DELETE FROM users
                                                 WHERE username=$1
                                                 RETURNING username`, [username]);
-            if (deletedUser.rows.length === 0) throw new NotFoundError('User not found');
+            if (deletedUser.rowCount === 0) throw new NotFoundError('User not found');
+
             return deletedUser.rows[0]
-        }catch(errors){
+        }
+        catch(errors){
             throw new BadRequestError(errors.message); // pass up to route
         }
     };
 
-    /** Updates user table. Returns username if data is successfully updated
+    /** Updates user table for the specified username with data provided
      *
-     * @param username {string} - case sensitive username
-     * @param dataToEdit {object} - key/value pairs of data to change
-     *      Ex: {email: 'newEmail@gmail.com', password: 'newPassword', ...}
+     *  @param username {string} - case sensitive username
+     *  @param dataToEdit {object} - key/value pairs of data to change
+     *       Ex: { email: 'newEmail@gmail.com', password: 'newPassword', ...}
+     *  @returns {object} { username: 'testUser' } or Error
      *
-     * @returns {object} {username: 'testUser'} or Error
+     *  Checks to make sure email is unique and hashes new password if provided
     */
     static async edit(username, dataToEdit){
         const jsToSql = {
@@ -114,37 +123,40 @@ class User {
                 await checkIfUsernameOrEmailExists(dataToEdit.email);
             };
             if('password' in dataToEdit) {
-            //  hash new password before storing
+                //  hash new password before storing
                 const hashedPassword = await bcrypt.hash(dataToEdit.password, BCRYPT_WORK_FACTOR);
                 dataToEdit.password = hashedPassword;
             };
             const {query, values} = sqlUpdateQueryBuilder('users', username, dataToEdit, jsToSql);
             const res = await db.query(query, values);
+
             return res.rows[0]
         }
         catch(errors){
-            throw new BadRequestError(errors.message);
+            throw new BadRequestError(errors.message); // pass up to route
         };
     };
 
-    /** Creates a game_stats row for new players using default values of 0.
+    /** Creates game_stats row for new players with default values of 0.
      *
      *  If the row fails to create, error is returned.
     */
     static async initGameStats(username){
         try{
-            const result = await db.query(` INSERT INTO game_stats (username)
+            const res = await db.query(`INSERT INTO game_stats (username)
                                         VALUES ($1)
                                         RETURNING username;`, [username]);
-            if (result.rows.length === 0) throw new BadRequestError('Failed to create game_stats');
-        }catch(errors){
-            throw new BadRequestError(errors.message);
+            if (res.rowCount === 0) throw new BadRequestError('Failed to create game_stats');
+        }
+        catch(errors){
+            throw new BadRequestError(errors.message); // pass up to route
         }
     };
 
     /** Return game stats for specified user
+     *
      *  @param username {string} - case sensitive username
-     *  @returns {object} - {username, gamesPlayed, gamesWon, gamesLost, battles, battlesWon, battlesLost}
+     *  @returns {object} - { username, gamesPlayed, gamesWon, battles, battlesWon} or Error
     */
     static async getGameStats(username){
         try{
@@ -156,16 +168,22 @@ class User {
                                                 battles_won AS "battlesWon"
                                         FROM game_stats
                                         WHERE username = $1`, [username]);
-            if(res.rows.length === 0) throw new BadRequestError('Unable to retrieve game stats');
+            if (res.rowCount === 0) throw new BadRequestError('Unable to retrieve game stats');
+
             return res.rows[0]
-        }catch(errors){
-            throw new BadRequestError(errors.message);
+        }
+        catch(errors){
+            throw new BadRequestError(errors.message); // pass up to route
         }
     };
 
-    /** Edit game stats and return username if successful
+    /** Updates game_stats table for the specified username with data provided
      *
-    */
+     *  @param username {string} - case sensitive username
+     *  @param dataToEdit {object} - key/value pairs of data to update
+     *       Ex: { gamesPlayed: 101, gamesWon: 64, battles: 3451, battlesWon: 2012 }
+     *  @returns {object} { username: 'testUser' } or Error
+     */
     static async editGameStats(username, dataToEdit){
         const jsToSql = {
             gamesPlayed: 'games_played',
@@ -178,16 +196,18 @@ class User {
 
             const { query, values } = sqlUpdateQueryBuilder('game_stats', username, dataToEdit, jsToSql);
             const res = await db.query(query, values);
-            if(res.rowCount === 0) throw new BadRequestError('Game stat update unsuccessful');
+
+            if (res.rowCount === 0) throw new BadRequestError('Failed to update game statistics');
 
             return res.rows[0]
-        }catch(errors){
+        }
+        catch(errors){
             throw new BadRequestError(errors.message);
         }
-    }
+    };
 };
 
 module.exports = {
     User,
     checkIfUsernameOrEmailExists
-}
+};

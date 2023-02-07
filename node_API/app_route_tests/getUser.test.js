@@ -1,4 +1,5 @@
 "use strict";
+
 const {commonAfterAll, seedTestDB} = require('../testSetup');
 const request = require('supertest');
 const app = require('../app');

@@ -4,11 +4,9 @@ const {User} = require('./user');
 const {seedTestDB, commonAfterAll} = require('../testSetup');
 const { BadRequestError } = require('../expressErrors');
 
-beforeAll(()=> {
-    console.log('UserAuth tests BeforeAll ->', 'NODE_ENV ->', process.env.NODE_ENV);
-    seedTestDB();
-});
-afterAll(()=> commonAfterAll());
+beforeAll(()=> console.log('UserAuth tests->', 'NODE_ENV ->', process.env.NODE_ENV));
+beforeEach(seedTestDB);
+afterAll(commonAfterAll);
 
 // ============================ User Registration  ================================================
 
@@ -34,12 +32,33 @@ describe('User.register', function() {
         expect(userData).not.toHaveProperty('password');
     });
 
-    it('should throw an error if username or email already exist', async () => {
-        expect.assertions(1);
+    it('should throw an error if username already exist', async () => {
+        expect.assertions(2);
         try{
-            await User.register(newUser); // repeat registering the newUser
+            await User.register({   username: "testUser",
+                                    password: 'unhashedPwd',
+                                    email: "nonExistingEmail@gmail.com",
+                                    firstName: "New",
+                                    lastName: 'User'
+                                });
         } catch(err){
             expect(err instanceof Error).toBeTruthy();
+            expect(err.message).toEqual("Username/email already exists");
+        };
+    });
+
+    it('should throw an error if email already exist', async () => {
+        expect.assertions(2);
+        try{
+            await User.register({   username: "nonExistingUser",
+                                    password: 'unhashedPwd',
+                                    email: "testUser@gmail.com",
+                                    firstName: "New",
+                                    lastName: 'User'
+                                });
+        } catch(err){
+            expect(err instanceof Error).toBeTruthy();
+            expect(err.message).toEqual("Username/email already exists");
         };
     });
 });
@@ -53,7 +72,7 @@ describe('User.login', function(){
             await User.login('nullUser', 'password');
         } catch(err) {
             expect(err instanceof BadRequestError).toBeTruthy();
-            expect(err.message).toEqual('User not found');
+            expect(err.message).toEqual('Incorrect username/password');
         }
     });
 
@@ -67,7 +86,7 @@ describe('User.login', function(){
         }
     });
 
-    it('returns user data (minus password) if username and password is correct', async() => {
+    it('returns user data (minus password) if username and password are correct', async() => {
         expect.assertions(2);
         const userData = await User.login('testUser2', 'password');
         expect(userData).toEqual({

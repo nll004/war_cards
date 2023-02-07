@@ -1,9 +1,8 @@
 "use strict";
+
 const { commonAfterAll, seedTestDB } = require('../testSetup');
 const request = require('supertest');
 const app = require('../app');
-
-// ======================  PATCH /user/:username Route ====================================================
 
 describe('PATCH /users/:username', function () {
     beforeAll(() => console.log('User edit route tests ->', 'NODE_ENV ->', process.env.NODE_ENV));

@@ -5,7 +5,7 @@ const { commonAfterAll, seedTestDB } = require('../testSetup');
 const { BadRequestError } = require('../expressErrors');
 const { db } = require('../db');
 
-beforeAll(() => console.log('GET /users/:username/stats tests ->', 'NODE_ENV ->', process.env.NODE_ENV));
+beforeAll(() => console.log('UserGameStats tests', 'NODE_ENV ->', process.env.NODE_ENV));
 beforeEach(seedTestDB);
 afterAll(commonAfterAll);
 
@@ -21,7 +21,7 @@ describe('User.initGameStats', function () {
             expect(err instanceof BadRequestError).toBeTruthy();
             expect(err.message).toContain('duplicate key value violates unique constraint');
         }
-    })
+    });
 });
 
 // ================================= Get Stats =========================================================
@@ -82,7 +82,7 @@ describe('User.editGameStats', function () {
             await User.editGameStats('testUser', { gamesPlayed: 1 });
         } catch (err) {
             expect(err instanceof BadRequestError).toBeTruthy();
-            expect(err.message).toContain('Game stat update unsuccessful');
+            expect(err.message).toContain('Failed to update game statistics');
         }
     });
 
@@ -93,7 +93,7 @@ describe('User.editGameStats', function () {
         const res = await User.editGameStats('testUser', gameStats);
         expect(res).toEqual({ username: 'testUser' });
 
-        // retrieve user to check stats
+        // retrieve user stats to ensure changes were made
         const userAfterEdit = await User.getGameStats('testUser');
         expect(userAfterEdit).toEqual({ username: 'testUser',
                                         gamesPlayed: 1,

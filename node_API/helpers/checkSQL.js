@@ -3,12 +3,12 @@
 const { db } = require("../db");
 const { BadRequestError } = require("../expressErrors");
 
-/** Returns error if either the username or email already exists in the database
+/** If the email or username provided is found in the database, throw error else return false
  *
- * @param username {string} - username
- * @param email {string} - full email address
+ *  @param email {string} - full email address
+ *  @param username {string} - username. Optional*
 */
-async function checkIfUsernameOrEmailExists(email, username) {
+async function checkIfUsernameOrEmailExists(email, username='') {
     const res = await db.query(`SELECT username, email
                                 FROM users
                                 WHERE email = $1 OR username = $2`,
