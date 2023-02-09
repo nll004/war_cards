@@ -2,6 +2,7 @@
 const jsonschema = require('jsonschema');
 const express = require("express");
 const app = express();
+const cors = require('cors');
 
 const { User } = require('./models/user');
 const createToken = require('./helpers/createToken');
@@ -11,6 +12,8 @@ const editUserSchema = require('./jsonSchemas/editUser.json');
 const editUserStatsSchema = require('./jsonSchemas/editUserStats.json');
 const { authenticateJWT, ensureLoggedIn, ensureCorrectUserOrAdmin } = require('./middleware/auths');
 const { BadRequestError, UnauthorizedError } = require('./expressErrors');
+
+app.use(cors());
 
 // Parse request bodies for JSON
 app.use(express.json());
