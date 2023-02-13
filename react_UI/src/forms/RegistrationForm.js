@@ -1,6 +1,5 @@
 import React, { useState, useContext } from "react";
-import "./Forms.css";
-import AuthContext from "./context/AuthContext";
+import AuthContext from "../context/AuthContext";
 
 function RegistrationForm({ showForm }) {
     const [formData, setFormData] = useState(null);
@@ -15,7 +14,7 @@ function RegistrationForm({ showForm }) {
     async function handleSubmit(evt) {
         evt.preventDefault();
         let result = await registerNewUser(formData);
-        if (result.errors) setErrors(result.errors);
+        if (result && result.errors) setErrors(result.errors);
     };
 
     return (

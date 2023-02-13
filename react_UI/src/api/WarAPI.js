@@ -38,6 +38,31 @@ class WarApi {
         return res._token
     };
 
+    /** Send username/password and store the returned token on class. */
+    static async login(formData) {
+        const res = await WarApi.request('users/login', formData, 'post');
+        WarApi.token = res._token;
+        return res._token
+    };
+
+    /** Get user data by username. A valid token must be present on the WarAPI class */
+    static async getUser(username) {
+        const res = await WarApi.request(`users/${username}`);
+        return res.user
+    };
+
+    /** Get user stats by username. A valid token must be present on the WarAPI class */
+    static async getUserStats(username) {
+        const res = await WarApi.request(`users/${username}/stats`);
+        return res.gameStats
+    };
+
+    /** Allows editing of user data and returns new user data */
+    static async editUser(username, formData) {
+        const res = await WarApi.request(`users/${username}`, formData, 'patch');
+        return res.user
+    };
+
 
 };
 

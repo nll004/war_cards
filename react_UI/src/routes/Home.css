@@ -1,0 +1,49 @@
+* {
+    padding: 0;
+    margin: 0;
+}
+
+.table {
+    height: 85vh;
+    border-radius: 20%;
+}
+
+#Game-table{
+    background-color: rgb(185, 185, 185);
+    padding-top: 2%;
+}
+
+#Game-table-design {
+    background-image: url('../images/vecteezy_suit-deck-of-playing-cards-on-white-background_5421236.jpg');
+    background-repeat: repeat;
+    background-size: 12vw;
+
+    border: 15px solid rgb(129, 74, 23);
+    box-shadow: 0 0 15px black;
+}
+
+#Game-table-color {
+    background-color: rgba(14, 57, 14, 0.95);
+    border-radius: 18%;
+}
+
+#Game-table-wall {
+    border: 5px solid green;
+    height: 84vh;
+    border-radius: 18%;
+}
+
+#img-credits {
+    font-size: 1vw;
+    color: black;
+    position: absolute;
+    right: 5%;
+    bottom: 0%;
+}
+
+/* Smartphones (portrait) -----------*/
+@media screen and (max-width: 320px) {
+    #Game-table-color{
+        background-color: rgba(0, 0, 255, 0.872);
+    }
+}
