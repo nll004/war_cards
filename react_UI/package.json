@@ -1,5 +1,5 @@
 {
-  "name": "my-app-name",
+  "name": "war_cards_ui",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -8,12 +8,13 @@
     "react": "^16.6.0",
     "react-dom": "^16.6.0",
     "react-router-dom": "^6.8.1",
-    "react-scripts": "2.0.5"
+    "react-scripts": "2.0.5",
+    "react-testing-library": "^7.0.1"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "jest -i",
+    "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
