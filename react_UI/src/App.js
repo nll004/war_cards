@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 import jwt from "jsonwebtoken";
 
 import RouteList from './routes/RouteList';
-import { WarApi } from './api/WarAPI';
+import { WarApi } from './apis/WarAPI';
 import UserContext from './context/UserContext';
 import AuthContext from './context/AuthContext';
 
@@ -36,7 +36,7 @@ function App() {
         try {
             const userData = await WarApi.getUser(username);
             const gameStats = await WarApi.getUserStats(username);
-            const user = {user: userData, stats: gameStats};
+            const user = {...userData, stats: gameStats};
             setCurrentUser(user);
         }
         catch (errors) {
