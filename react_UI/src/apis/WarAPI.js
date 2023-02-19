@@ -62,8 +62,6 @@ class WarApi {
         const res = await WarApi.request(`users/${username}`, formData, 'patch');
         return res.user
     };
-
-
 };
 
 export { WarApi, WAR_CARDS_BACKEND_URL};

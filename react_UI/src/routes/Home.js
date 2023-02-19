@@ -1,7 +1,7 @@
 import React, {useContext} from "react";
 import { Outlet, NavLink, Link } from "react-router-dom";
 
-import GameTable from "../gameComponents/GameTable";
+import Game from "../gameComponents/Game";
 import UserContext from '../context/UserContext';
 import AuthContext from '../context/AuthContext';
 
@@ -29,7 +29,7 @@ function HomePage(){
             </header>
             <main>
                 <Outlet />
-                <GameTable />
+                <Game />
             </main>
         </>
     )
