@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from "react";
 import BattlePrompt from "../forms/BattlePrompt";
 import GameTable from "./GameTable";
+import GameAlert from "./GameAlert";
 import CardsApi from "../apis/CardsApi";
 
 const DECK_KEY = 'Y3h5na938qb45';
@@ -24,17 +25,18 @@ const CARD_RANKS = {
 }
 
 function Game(){
-    const [stats, setStats] = useState({ gamesPlayed: null, gamesWon: null, battles: null, battlesWon: null });
+    const [stats, setStats] = useState({ gamesPlayed: 0, gamesWon: 0, battles: 0, battlesWon: 0 });
     const [deck, setDeck] = useState({ p1: null, p2: null });
     const [p1DrawnCards, setP1DrawnCards] = useState(null);
     const [p2DrawnCards, setP2DrawnCards] = useState(null);
     const [cardBattle, setCardBattle] = useState(null);
+    const [checkBattle, setCheckBattle] = useState(null);
     const [cardsInPlay, setCardsInPlay] = useState(false);
     const [battlePrompt, setBattlePrompt] = useState(false);
+    const [alert, setAlert] = useState({message: null});
     const [endGame, setEndGame] = useState(null);
 
     useEffect(()=> {        // get LS values on refresh
-        console.log('checking LS')
         setEndGame(JSON.parse(localStorage.getItem('game')));
         setStats(JSON.parse(localStorage.getItem('stats')));
         setP1DrawnCards(JSON.parse(localStorage.getItem(P1_KEY)));
@@ -44,7 +46,6 @@ function Game(){
     }, []);
 
     useEffect(() => {       // refresh LS with every set of drawn cards
-        console.log('refreshing LS')
         localStorage.setItem('game', endGame);
         localStorage.setItem('stats', JSON.stringify(stats));
         localStorage.setItem('battle', cardBattle);
@@ -55,7 +56,11 @@ function Game(){
 
     useEffect(()=> {        // compare p1 and p2 cards 3s after p2 draws
         if (cardsInPlay) setTimeout(()=> checkCardsForWinner(), 1000);
-    }, [cardsInPlay])
+    }, [cardsInPlay]);
+
+    useEffect(()=>{
+        if(alert.message) setTimeout(()=> setAlert({message: null}), 3000);
+    }, [alert])
 
     /** Get new shuffled deck to split between players */
     async function startNewGame(){
@@ -64,14 +69,13 @@ function Game(){
         setDeck({   p1: cards.slice(0, middleIndex),
                     p2: cards.slice(-middleIndex)
                 });
-        setStats({ gamesPlayed: 1, gamesWon: null, battles: null, battlesWon: null });
+        setStats({ gamesPlayed: 1, gamesWon: 0, battles: 0, battlesWon: 0 });
         // reset state
         setP1DrawnCards(null);
         setP2DrawnCards(null);
         setCardsInPlay(false);
         setEndGame(false);
-        setCardBattle(false); // cardBattle is last to reset LS in useEffect
-        console.log('started new game', stats)
+        setCardBattle(false);
     };
 
     /** Player draws card, flips up and stores in drawn card state */
@@ -120,18 +124,27 @@ function Game(){
         const p2Card = p2DrawnCards.slice(-1);
 
         if (p1Card[0].value === p2Card[0].value){
-            // if cards match but one player is unable to battle because
-            // they have no more cards in the deck, they lose the hand/game
+            // if one of the players has no cards in deck to battle, they lose
             if (deck.p1.length === 0) return winsHand('p2');
             if (deck.p2.length === 0) return winsHand('p1');
 
-            alert(`BATTLE!!! ${deck.p1.length}, ${deck.p2.length}`);
+            setAlert({message: `Card Battle!`})
             setCardBattle(true);
         }
-        else if (p1Card[0].value === "2" && p2Card[0].value === "ACE") return winsHand('p1');
-        else if (p2Card[0].value === "2" && p1Card[0].value === "ACE") return winsHand('p2');
-        else if (CARD_RANKS[p1Card[0].value] > CARD_RANKS[p2Card[0].value]) return winsHand('p1');
-        else return winsHand('p2');
+        else if (p1Card[0].value === "2" && p2Card[0].value === "ACE") {
+            if(checkBattle) setStats(prev => ({ ...prev, battlesWon: prev.battlesWon + 1 }));
+            winsHand('p1');
+        }
+        else if (CARD_RANKS[p1Card[0].value] > CARD_RANKS[p2Card[0].value]) {
+            if (checkBattle) setStats(prev => ({ ...prev, battlesWon: prev.battlesWon + 1 }));
+            winsHand('p1');
+        }
+        else if (p2Card[0].value === "2" && p1Card[0].value === "ACE") {
+            winsHand('p2');
+        } else {
+            winsHand('p2');
+        }
+        setCheckBattle(false);
     };
 
     function battle(drawAmt){
@@ -142,35 +155,33 @@ function Game(){
         setP1DrawnCards(cards => ([...cards, ...p1Cards]));
         setP2DrawnCards(cards => ([...cards, ...p2Cards]));
 
-        setCardBattle(false);
+        setCheckBattle(true);
+        setBattlePrompt(false);
         setCardsInPlay(false);
+        setCardBattle(false);
     };
 
     /** Sends game stats to API  */
     function gameOver(player) {
-        // who won?
         if (player === 'p1') {
-            alert("You win!");
+            setAlert({message: "Congratulations! You win!"});
             setStats(prev => ({ ...prev, gamesWon: 1 }));
         };
         if (player === 'p2') {
-            alert("You lost! Better luck next time!");
+            setAlert({ message: "You lost. Better luck next time!" });
             setStats(prev => ({ ...prev, gamesWon: 0 }));
-
         }
-        console.log('The game is over....', stats.current);
 
         // API call to store stats
-
     };
 
     return (
         <>
             <GameTable />
-
-            <button onClick={startNewGame}> {(endGame || !deck.p1)? "New Game" : "Restart"} </button>
+            {alert && <GameAlert message={alert.message} />}
+            <button onClick={startNewGame}> {(endGame || !deck.p1 || !deck.p2)? "New Game" : "Restart"} </button>
             {(!cardsInPlay && !cardBattle) && <button onClick={()=>p1DrawCard()}> Draw </button>}
-            {cardBattle && <button onClick={()=>setBattlePrompt(true)}> Battle </button>}
+            {cardBattle && !battlePrompt && <button onClick={()=>setBattlePrompt(true)}> Battle </button>}
             {battlePrompt && cardBattle && <BattlePrompt battle={battle} deck={deck}/>}
 
             <h1>Player 1</h1>
