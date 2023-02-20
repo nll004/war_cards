@@ -14,6 +14,8 @@ This API was created with:
 
 ## API Routes
 
+### Register new user and get token
+
     POST /user/register
 
 **Requires:**
@@ -26,6 +28,7 @@ Body - {username, password, firstName, lastName, email}
 
 Route checks for existing username/email and hashes password before storing new user. Returns a success boolean, user data (minus password) and a JWT with expiration value, admin boolean and username.
 
+### User login and get token
 
     POST /user/login
 
@@ -39,6 +42,7 @@ Body - {username, password}
 
 Route checks username and password against hashed password. If username/password combination is correct, returns a success boolean, user data (minus password) and a JWT with expiration value, admin boolean and username
 
+### Get user info
 
     GET /user/:username
 
@@ -52,6 +56,7 @@ Headers - authorization: "Bearer tokenString"
 
 If token is provided correctly and validated, returns a success boolean and user data (minus password)
 
+### Edit user info
 
     PATCH /user/:username
 
@@ -71,6 +76,7 @@ Only admin users can alter admin status of other users.
 
 If token is validated and user has permissions to make changes, route checks if the provided email already exists before making changes and hashes any new password before storing the edited information. Returns a success boolean and modified object with user's username.
 
+### Delete user
 
     DELETE /user/:username
 
@@ -84,6 +90,7 @@ Headers - authorization: "Bearer tokenString"
 
 If token is provided correctly and validated, returns a success boolean and deleted object with user's username
 
+### Get user stats
 
     GET /user/:username/stats
 
@@ -97,6 +104,7 @@ Headers - authorization: "Bearer tokenString"
 
 Route validates token and if user has permissions to retrieve user. Returns success boolean and gameStats object if successful.
 
+### Edit user stats
 
     PATCH /user/:username/stats
 
