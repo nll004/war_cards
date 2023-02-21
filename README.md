@@ -23,8 +23,8 @@ War the card game that fetches cards from the [Cards API](https://www.deckofcard
 
 ## Future Direction for Project
 - Improve styling
-- Include more stats (cards won, hands won, double battles, double battles won, etc.)
-- Let user determine the amount of decks or if they want to play with only certain cards
-- Include an autodraw option
 - Include a random bet or max bet option for battles
+- Include more stats (cards won, hands won, double battles, double battles won, etc.)
+- Let user determine the amount of decks or if they want to play with
+- Include an autodraw option
 - Introduce a websocket for 2 player functionality
