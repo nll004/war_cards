@@ -1,8 +1,8 @@
 # War Cards API
 
-This API was developed to serve my implementation of the WAR cards game. It provides CRUD operations for users as well as retrieving and updating game stats for users.
+This API was developed to support my implementation of the [WAR](https://github.com/nll004/war_cards) cards game. It provides CRUD operations for users as well as retrieving and updating game stats for users.
 
-This API was created with:
+### Technologies Used
 - Node.js
 - Express.js
 - JEST testing
