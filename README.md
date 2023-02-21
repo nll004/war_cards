@@ -1,13 +1,14 @@
 # Card War Game
-Springboard software engineering bootcamp - Cohort Jan 2022
-Project started Jan 2023
+War the card game that fetches cards from the [Cards API](https://www.deckofcardsapi.com/). This project consists of the [React frontend](https://github.com/nll004/war_cards/tree/main/react_UI) and an [Express.js API](https://github.com/nll004/war_cards/tree/main/node_API) that I built to handle CRUD operations for users and game stats. 
 
-## Assignment
-For a final capstone project I needed to incorporate an external API and create a full stack project. Games tend to be very challenging and provide lots of opportunity for future features. I selected a free [Cards API](https://www.deckofcardsapi.com/) for this project and built my own [Express.js API](https://github.com/nll004/war_cards/tree/main/node_API) to handle CRUD operations for users and game stats. Being more comfortable with the Express API, I focused carefully on validating requests, testing, handling errors and careful documentation to ensure a secure and readable backend API. I added admin validations to support future features and deployed my API on Heroku.
+## Features
+- Create new user
+- Login/logout
+- Can play with or without being logged in
+- Being logged in stores statistics for user
+- Edit users information including password
 
-I wanted to challenge myself with the [React UI](https://github.com/nll004/war_cards/tree/main/react_UI) for this particular project. Up to this point I have primarily styled all of my projects with basic CSS. Games require more animations, transitions and careful styling. I thought this would be a perfect opportunity to experiment with the parts of CSS I have not yet explored or introduce some frontend libraries like Material UI or Tailwind CSS to build my knowledge and experience.
-
-## Technologies Used
+### Technologies Used
 - Node.js
 - Express.js
 - React.js
@@ -19,3 +20,11 @@ I wanted to challenge myself with the [React UI](https://github.com/nll004/war_c
 - Bcrypt
 - Axios
 - PostgreSQL and PG driver
+
+## Future Direction for Project
+- Improve styling
+- Include more stats (cards won, hands won, double battles, double battles won, etc.)
+- Let user determine the amount of decks or if they want to play with only certain cards
+- Include an autodraw option
+- Include a random bet or max bet option for battles
+- Introduce a websocket for 2 player functionality
