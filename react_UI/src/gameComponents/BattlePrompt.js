@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
-function BattlePrompt({battle, deck}){
-    const [drawAmt, setDrawAmt] = useState(null);
+function BattlePrompt({battle, deck, draw}){
+    const [drawAmt, setDrawAmt] = useState(1);
     const [errors, setErrors] = useState(null);
 
     const handleChange = (evt) => {
@@ -11,6 +11,10 @@ function BattlePrompt({battle, deck}){
     function handleSubmit(evt){
         evt.preventDefault();
 
+        if(deck.p1.length <= 1 || deck.p2.length <= 1) {
+            setErrors("Not enough cards. Hit battle to continue.");
+            return draw();
+        }
         if (drawAmt < 1) {
             setErrors("Don't be afraid! At least risk one card.");
             return setDrawAmt(1);

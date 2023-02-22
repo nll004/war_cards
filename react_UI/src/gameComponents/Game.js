@@ -1,8 +1,12 @@
 import React, {useState, useEffect} from "react";
-import BattlePrompt from "../forms/BattlePrompt";
+import BattlePrompt from "./BattlePrompt";
 import GameTable from "./GameTable";
 import GameAlert from "./GameAlert";
 import CardsApi from "../apis/CardsApi";
+import { WarApi } from "../apis/WarAPI";
+
+const DELAY = (process.env.NODE_ENV === 'test') ? 0 : 3000;
+const ALERT_DELAY = (process.env.NODE_ENV === 'test') ? 0 : 4000;
 
 const DECK_KEY = 'Y3h5na938qb45';
 const P1_KEY= '8ie284-sha9eth1';
@@ -24,17 +28,19 @@ const CARD_RANKS = {
     "ACE": 14
 }
 
-function Game(){
+function Game( {currentUser} ){
     const [stats, setStats] = useState({ gamesPlayed: 0, gamesWon: 0, battles: 0, battlesWon: 0 });
     const [deck, setDeck] = useState({ p1: null, p2: null });
     const [p1DrawnCards, setP1DrawnCards] = useState(null);
     const [p2DrawnCards, setP2DrawnCards] = useState(null);
-    const [cardBattle, setCardBattle] = useState(null);
-    const [checkBattle, setCheckBattle] = useState(null);
-    const [cardsInPlay, setCardsInPlay] = useState(false);
+    const [cardsAreInPlay, setCardsInPlay] = useState(false);
+
+    const [showBattleBtn, setShowBattleBtn] = useState(null);
+    const [activeBattle, setActiveBattle] = useState(null);
     const [battlePrompt, setBattlePrompt] = useState(false);
-    const [alert, setAlert] = useState({message: null});
+
     const [endGame, setEndGame] = useState(null);
+    const [alert, setAlert] = useState({message: null});
 
     useEffect(()=> {        // get LS values on refresh
         setEndGame(JSON.parse(localStorage.getItem('game')));
@@ -42,24 +48,24 @@ function Game(){
         setP1DrawnCards(JSON.parse(localStorage.getItem(P1_KEY)));
         setP2DrawnCards(JSON.parse(localStorage.getItem(P2_KEY)));
         setDeck(JSON.parse(localStorage.getItem(DECK_KEY)));
-        setCardBattle(JSON.parse(localStorage.getItem('battle')));
+        setShowBattleBtn(JSON.parse(localStorage.getItem('battle')));
     }, []);
 
     useEffect(() => {       // refresh LS with every set of drawn cards
         localStorage.setItem('game', endGame);
         localStorage.setItem('stats', JSON.stringify(stats));
-        localStorage.setItem('battle', cardBattle);
+        localStorage.setItem('battle', showBattleBtn);
         localStorage.setItem(P1_KEY, JSON.stringify(p1DrawnCards));
         localStorage.setItem(P2_KEY, JSON.stringify(p2DrawnCards));
         localStorage.setItem(DECK_KEY, JSON.stringify(deck));
-    }, [p2DrawnCards, cardBattle, stats]);
+    }, [p2DrawnCards, showBattleBtn, stats]);
 
     useEffect(()=> {        // compare p1 and p2 cards 3s after p2 draws
-        if (cardsInPlay) setTimeout(()=> checkCardsForWinner(), 1000);
-    }, [cardsInPlay]);
+        if (cardsAreInPlay) setTimeout(()=> checkCardsForWinner(), DELAY);
+    }, [cardsAreInPlay]);
 
     useEffect(()=>{
-        if(alert.message) setTimeout(()=> setAlert({message: null}), 3000);
+        if(alert.message) setTimeout(()=> setAlert({message: null}), ALERT_DELAY);
     }, [alert])
 
     /** Get new shuffled deck to split between players */
@@ -75,12 +81,12 @@ function Game(){
         setP2DrawnCards(null);
         setCardsInPlay(false);
         setEndGame(false);
-        setCardBattle(false);
+        setShowBattleBtn(false);
     };
 
     /** Player draws card, flips up and stores in drawn card state */
     function p1DrawCard() {
-        if(deck.p1 && deck.p1.length > 0) {
+        if(deck.p1 && deck.p1.length > 0 && deck.p1.length < 52) {
             const drawnCard = deck.p1.pop();
             drawnCard.flipped = true;
             setP1DrawnCards(cards => Array.isArray(cards) ? [...cards, drawnCard] : [drawnCard]);
@@ -129,22 +135,24 @@ function Game(){
             if (deck.p2.length === 0) return winsHand('p1');
 
             setAlert({message: `Card Battle!`})
-            setCardBattle(true);
+            setShowBattleBtn(true);
         }
         else if (p1Card[0].value === "2" && p2Card[0].value === "ACE") {
-            if(checkBattle) setStats(prev => ({ ...prev, battlesWon: prev.battlesWon + 1 }));
+            if(activeBattle) setStats(prev => ({ ...prev, battlesWon: prev.battlesWon + 1 }));
+            setAlert({message: "Major win!!"})
             winsHand('p1');
         }
         else if (CARD_RANKS[p1Card[0].value] > CARD_RANKS[p2Card[0].value]) {
-            if (checkBattle) setStats(prev => ({ ...prev, battlesWon: prev.battlesWon + 1 }));
+            if (activeBattle) setStats(prev => ({ ...prev, battlesWon: prev.battlesWon + 1 }));
             winsHand('p1');
         }
         else if (p2Card[0].value === "2" && p1Card[0].value === "ACE") {
+            setAlert({ message: "Ouch.. that one really stings" })
             winsHand('p2');
         } else {
             winsHand('p2');
         }
-        setCheckBattle(false);
+        setActiveBattle(false);
     };
 
     function battle(drawAmt){
@@ -155,34 +163,46 @@ function Game(){
         setP1DrawnCards(cards => ([...cards, ...p1Cards]));
         setP2DrawnCards(cards => ([...cards, ...p2Cards]));
 
-        setCheckBattle(true);
+        setActiveBattle(true);
         setBattlePrompt(false);
         setCardsInPlay(false);
-        setCardBattle(false);
+        setShowBattleBtn(false);
     };
 
     /** Sends game stats to API  */
     function gameOver(player) {
         if (player === 'p1') {
-            setAlert({message: "Congratulations! You win!"});
+            setAlert({message: "You may have lost some battles but you won the WAR!"});
             setStats(prev => ({ ...prev, gamesWon: 1 }));
         };
         if (player === 'p2') {
-            setAlert({ message: "You lost. Better luck next time!" });
+            setAlert({ message: "Sorry.. You can't win them all." });
             setStats(prev => ({ ...prev, gamesWon: 0 }));
         }
+        setDeck({ p1: null, p2: null });
 
-        // API call to store stats
+        // If logged in, send game stats to API
+        try{
+            if(currentUser) WarApi.editUserStats(currentUser.username, stats);
+        }catch (error){
+            console.error(`Failed to update user stats: ${error}`);
+        };
     };
 
     return (
         <>
             <GameTable />
-            {alert && <GameAlert message={alert.message} />}
-            <button onClick={startNewGame}> {(endGame || !deck.p1 || !deck.p2)? "New Game" : "Restart"} </button>
-            {(!cardsInPlay && !cardBattle) && <button onClick={()=>p1DrawCard()}> Draw </button>}
-            {cardBattle && !battlePrompt && <button onClick={()=>setBattlePrompt(true)}> Battle </button>}
-            {battlePrompt && cardBattle && <BattlePrompt battle={battle} deck={deck}/>}
+        {alert &&
+            <GameAlert message={alert.message} />}
+            <button onClick={startNewGame}>
+                {(endGame || !deck.p1 || !deck.p2)? "New Game" : "Restart"}
+            </button>
+
+        {(!cardsAreInPlay && !showBattleBtn) &&
+            <button onClick={()=>p1DrawCard()}> Draw </button>}
+
+            {showBattleBtn && !battlePrompt && <button onClick={()=>setBattlePrompt(true)}> Battle </button>}
+            {battlePrompt && showBattleBtn && <BattlePrompt battle={battle} deck={deck} draw={p1DrawCard}/>}
 
             <h1>Player 1</h1>
             {deck && deck.p1 && <p>Cards in Deck: {deck.p1.length }</p>}

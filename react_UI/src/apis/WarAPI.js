@@ -16,7 +16,6 @@ class WarApi {
         const params = (method === "get")
             ? data
             : {};
-
         try {
             const res = await (await axios({ url, method, data, params, headers })).data;
             console.debug("API Response:", res);
@@ -51,16 +50,22 @@ class WarApi {
         return res.user
     };
 
+    /** Allows editing of user data and returns new user data */
+    static async editUser(username, formData) {
+        const res = await WarApi.request(`users/${username}`, formData, 'patch');
+        return res.user
+    };
+
     /** Get user stats by username. A valid token must be present on the WarAPI class */
     static async getUserStats(username) {
         const res = await WarApi.request(`users/${username}/stats`);
         return res.gameStats
     };
 
-    /** Allows editing of user data and returns new user data */
-    static async editUser(username, formData) {
-        const res = await WarApi.request(`users/${username}`, formData, 'patch');
-        return res.user
+    /** Edit users stats. A valid token must be present on the WarAPI class */
+    static async editUserStats(username, formData) {
+        const res = await WarApi.request(`users/${username}/stats`, formData, 'patch');
+        return res.data
     };
 };
 
