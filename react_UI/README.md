@@ -1,15 +1,13 @@
-# War Cards - React UI
+# War Cards React
 
-This is the user interface for my implementation of the War Cards game.
+This is the frontend for my implementation of the [WAR](https://github.com/nll004/war_cards) Cards game. It is dependent on the [Cards API](https://www.deckofcardsapi.com/) and the [Express.js API](https://github.com/nll004/war_cards/tree/main/node_API) I built to handle user registration and game statistics. 
 
-
-This UI was created with:
+### Technologies Used
 - React.js
 - React router
 - HTML/CSS
 - Axios
 - Jest and React testing library
-
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
