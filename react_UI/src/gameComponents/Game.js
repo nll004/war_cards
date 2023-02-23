@@ -4,6 +4,7 @@ import GameTable from "./GameTable";
 import GameAlert from "./GameAlert";
 import CardsApi from "../apis/CardsApi";
 import { WarApi } from "../apis/WarAPI";
+// import "./Game.css";
 
 const DELAY = (process.env.NODE_ENV === 'test') ? 0 : 3000;
 const ALERT_DELAY = (process.env.NODE_ENV === 'test') ? 0 : 4000;
@@ -192,28 +193,57 @@ function Game( {currentUser} ){
     return (
         <>
             <GameTable />
-        {alert &&
-            <GameAlert message={alert.message} />}
-            <button onClick={startNewGame}>
-                {(endGame || !deck.p1 || !deck.p2)? "New Game" : "Restart"}
+
+            {alert && <GameAlert message={alert.message} />}
+
+            <button onClick={startNewGame}
+                    className='game-start-btn btn'>
+                {(endGame || (deck && (!deck.p1 || !deck.p2)))? "New Game" : "Restart"}
             </button>
 
-        {(!cardsAreInPlay && !showBattleBtn) &&
-            <button onClick={()=>p1DrawCard()}> Draw </button>}
+            <section id='container'>
+                <div id="p2-deck">
+                    {deck && deck.p2 && <>
+                        <div className="card">
+                            <img src={require('../images/card.jpg')} alt='Back of playing card'></img>
+                        </div>
+                        <h2> <span> {deck.p2.length} </span>
+                            Computer
+                        </h2>
+                    </>}
+                </div>
+
+                <div id='p2-card-container'>
+                    <ul>
+                        {p2DrawnCards && p2DrawnCards.map((c) => (c.flipped) ? <p>Card: {c.code}</p> : <p>Blank</p>)}
+                    </ul>
+                </div>
+
+                <div id="p1-card-container">
+                    <ul>
+                        {p1DrawnCards && p1DrawnCards.map((c) => (c.flipped) ? <p>Card: {c.code}</p> : <p>Blank</p>)}
+                    </ul>
+                </div>
+
+                <div id="p1-deck">
+                    <h1 className="heading p1-heading">
+                        {(currentUser) ? currentUser.username : "Guest"}
+                        {deck && deck.p1 && <span> {deck.p1.length} </span>}
+                    </h1>
+                    {deck && deck.p1 &&
+                        <div className="card"
+                            /** conditionally applying onclick to card, if no cards already in play you can draw */
+                            {...(!cardsAreInPlay && !showBattleBtn && { onClick: p1DrawCard })}>
+                            <img src={require('../images/card.jpg')} alt='Back of playing card'></img>
+                        </div>
+                    }
+                </div>
+            </section>
+
+
 
             {showBattleBtn && !battlePrompt && <button onClick={()=>setBattlePrompt(true)}> Battle </button>}
             {battlePrompt && showBattleBtn && <BattlePrompt battle={battle} deck={deck} draw={p1DrawCard}/>}
-
-            <h1>Player 1</h1>
-            {deck && deck.p1 && <p>Cards in Deck: {deck.p1.length }</p>}
-            <ul>
-                {p1DrawnCards && p1DrawnCards.map((c)=> (c.flipped)? <p>Card: {c.code}</p> : <p>Blank</p> )}
-            </ul>
-            <h1>Player 2</h1>
-            {deck && deck.p2 && <p>Cards in Deck: {deck.p2.length}</p>}
-            <ul>
-                {p2DrawnCards && p2DrawnCards.map((c) => (c.flipped) ? <p>Card: {c.code}</p> : <p>Blank</p>)}
-            </ul>
         </>
     )
 }
