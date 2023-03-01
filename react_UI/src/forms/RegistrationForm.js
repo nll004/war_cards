@@ -1,5 +1,6 @@
 import React, { useState, useContext, useRef, useEffect } from "react";
 import { Navigate } from "react-router-dom";
+import { Container, Input, Button, Form, FormGroup, Label, Row, Col } from "reactstrap";
 import AuthContext from "../context/AuthContext";
 import "./Forms.css";
 
@@ -31,64 +32,86 @@ function RegistrationForm({ showForm }) {
     async function handleSubmit(evt) {
         evt.preventDefault();
         let result = await registerNewUser(formData);
-        if (result && result.errors) setErrors(result.errors);
+        if (result && result.errors) return setErrors(result.errors);
+        return setIsOpen(false);
     };
 
     return (
-        <>
+        <div ref={componentRef} className='Form-container'>
             {!isOpen && <Navigate to='/' />}
-            <div ref={componentRef} >
-                <form   onSubmit={handleSubmit} >
-                    <h2 className="Form-header">Create your account</h2>
-                    {errors && <p className="Form-error"> {errors[0]} </p>}
-                    <input className="Form-input"
-                        type='text'
-                        placeholder="Create an username"
-                        required
-                        name="username"
-                        autoComplete="username"
-                        onChange={handleChange} />
-                    <input className="Form-input"
-                        type='text'
-                        placeholder="Enter your first name"
-                        required
-                        name="firstName"
-                        autoComplete="given-name"
-                        onChange={handleChange} />
-                    <input className="Form-input"
-                        type='text'
-                        placeholder="Enter your last name"
-                        required
-                        name="lastName"
-                        autoComplete="family-name"
-                        onChange={handleChange} />
-                    <input className="Form-input"
-                        type='email'
-                        placeholder="Enter your email"
-                        required
-                        name="email"
-                        autoComplete="email"
-                        onChange={handleChange} />
-                    <input className="Form-input"
-                        type='password'
-                        placeholder="Create a password"
-                        required
-                        name="password"
-                        autoComplete="new-password"
-                        onChange={handleChange} />
-                    <button className="Form-submit-btn">
-                        Signup
-                    </button>
-                </form>
-                <div>
-                    <p> Why sign up?</p>
-                    <p> Create your free account </p>
-                    <p> Track your battles </p>
-                    <p> View your stats </p>
-                    <p> Edit your preferences </p>
-                </div>
-            </div>
-        </>
+            <Container fluid='sm' className="bg-light border" >
+                <Row>
+                    <Col>
+                        <Form onSubmit={handleSubmit} >
+                            <Row xs='4'>
+                                <Col> <h2 className="Form-header">Signup</h2> </Col>
+                                <Col xs='6'> {errors && <p className="Form-error"> {errors[0]} </p>} </Col>
+                            </Row>
+                            <FormGroup  floating>
+                                <Input  id="regUsername"
+                                        placeholder="Create an username"
+                                        required
+                                        min='6'
+                                        max='12'
+                                        name="username"
+                                        autoComplete="username"
+                                        onChange={handleChange} />
+                                <Label  for="regUsername"> Username </Label>
+                            </FormGroup>
+                            <FormGroup  floating>
+                                <Input  id="regFirstName"
+                                        placeholder="Enter your first name"
+                                        required
+                                        name="firstName"
+                                        autoComplete="given-name"
+                                        onChange={handleChange} />
+                                <Label  for="regFirstName">First Name</Label>
+                            </FormGroup>
+                            <FormGroup  floating>
+                                <Input  id='regLastName'
+                                        placeholder="Enter your last name"
+                                        required
+                                        name="lastName"
+                                        autoComplete="family-name"
+                                        onChange={handleChange} />
+                                <Label  for='regLastName'> Last Name </Label>
+                            </FormGroup>
+                            <FormGroup  floating>
+                                <Input  id='regEmail'
+                                        type='email'
+                                        placeholder="Enter your email"
+                                        required
+                                        name="email"
+                                        autoComplete="email"
+                                        onChange={handleChange} />
+                                <Label  for='regEmail'> Email </Label>
+                            </FormGroup>
+                            <FormGroup  floating>
+                                <Input  id='regPassword'
+                                        required
+                                        type='password'
+                                        min='8'
+                                        placeholder="Create a password"
+                                        name="password"
+                                        autoComplete="new-password"
+                                        onChange={handleChange} />
+                                <Label for='regPassword'> Password </Label>
+                            </FormGroup>
+                            <Button className="Form-submit-btn"> Register </Button>
+                        </Form>
+                    </Col>
+                    <Col xs='4' id="reg-info">
+                        <Container fluid='sm' className="bg-dark border">
+                            <h3 style={{marginTop: "10px", color: "whitesmoke"}}> Why sign up?</h3>
+                            <hr style={{color: "white"}}/>
+                            <p className="reg-info-text"> Track your battles </p>
+                            <p className="reg-info-text"> View your stats </p>
+                            <p className="reg-info-text"> Edit your preferences </p>
+                        </Container>
+                    </Col>
+                </Row>
+            </Container>
+        </div>
     )
 };
 

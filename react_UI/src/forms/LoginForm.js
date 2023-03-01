@@ -1,6 +1,8 @@
 import React, { useState, useContext, useEffect, useRef } from "react";
 import { Navigate } from "react-router-dom";
+import {Container, Input, Button, Form, FormGroup, Label, Row, Col} from "reactstrap";
 import AuthContext from "../context/AuthContext";
+import "./Forms.css";
 
 function LoginForm() {
     const [formData, setFormData] = useState(null);
@@ -30,38 +32,50 @@ function LoginForm() {
     async function handleSubmit(evt){
         evt.preventDefault();
         let result = await userLogin(formData);
-        if (result && result.errors) setErrors(result.errors);
+        if (result && result.errors) return setErrors(result.errors);
+        return setIsOpen(false);
     };
 
     return (
-        <>
+        <div ref={componentRef} className='Form-container'>
             {!isOpen && <Navigate to='/' />}
-            <div ref={componentRef}>
-                <form onSubmit={handleSubmit} >
-                    <h2 className="Form-header"> Login </h2>
-                    {errors && <p className="Form-error">{errors[0]}</p>}
-                    <input className="Form-input"
-                        type='text'
-                        required
-                        name='username'
-                        placeholder="Username"
-                        autoComplete="username"
-                        onChange={handleChange}
-                    />
-                    <input className="Form-input"
-                        type='password'
-                        required
-                        name='password'
-                        placeholder="Password"
-                        autoComplete='current-password'
-                        onChange={handleChange}
-                    />
-                    <button className="Form-submit-btn">
-                        Login
-                    </button>
-                </form>
-            </div>
-        </>
+            <Container fluid='sm' className="bg-light border">
+                <Form onSubmit={handleSubmit} >
+                    <Row xs='4'>
+                        <Col >
+                            <h3 className="Form-header"> Login </h3>
+                        </Col>
+                        <Col xs='6'>
+                            {errors && <p className="Form-error">{errors[0]}</p>}
+                        </Col>
+                    </Row>
+                    <FormGroup floating>
+                        <Input  id="loginUsername"
+                                name='username'
+                                placeholder="Username"
+                                autoComplete="username"
+                                required
+                                onChange={handleChange}
+                                className='Form-input'
+                        />
+                        <Label for='loginUsername'> Username </Label>
+                    </FormGroup>
+                    <FormGroup floating>
+                        <Input  id="loginPassword"
+                                type='password'
+                                name='password'
+                                placeholder="Password"
+                                autoComplete='current-password'
+                                required
+                                onChange={handleChange}
+                                className='Form-input'
+                        />
+                        <Label for='loginPassword'> Password </Label>
+                    </FormGroup>
+                    <Button className="Form-submit-btn"> Login </Button>
+                </Form>
+            </Container>
+        </div>
     )
 };
 
