@@ -111,7 +111,6 @@
     font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
 }
 
-
 #p1 h2 {
     text-align: right;
 }
@@ -128,7 +127,6 @@
 #p1 h3 {
     text-align: left;
 }
-
 
 /* Card back img for deck */
 .Player-deck img {
@@ -165,7 +163,7 @@
     background-color: transparent;
     border: 1px solid black;
     border-radius: 10px;
-    height: 40vh;
+    height: 45vh;
 }
 
 .face-down-card {

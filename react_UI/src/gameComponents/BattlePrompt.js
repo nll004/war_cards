@@ -22,7 +22,7 @@ function BattlePrompt({battle, deck, draw}){
             setErrors("Don't be afraid! At least risk one card.");
             return setDrawAmt(1);
         }
-        else if (drawAmt > 46) {
+        else if (drawAmt > 6) {
             setErrors("Whoa tiger! Lets cap it at 6 cards.");
             return setDrawAmt(6);
         };
