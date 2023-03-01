@@ -1,0 +1,32 @@
+nav {
+    background-color: rgb(51, 51, 51);
+    border-bottom: 1px solid white;
+    box-shadow: 0 0 10px black;
+}
+
+/* unset reactstrap formatting */
+.navbar-collapse {
+    flex-grow: unset;
+}
+
+.nav-link {
+    color: white;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1.5rem;
+    text-decoration: none;
+    font-weight: bolder;
+}
+
+.nav-link:hover {
+    color: rgb(172, 172, 172);
+}
+
+#nav-btn {
+    justify-self: center;
+    background: none;
+    border: none;
+}
+
+#nav-btn:hover {
+    background-color: none;
+}

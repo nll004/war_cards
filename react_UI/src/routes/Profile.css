@@ -1,0 +1,24 @@
+#Prof-card {
+    background-color: whitesmoke;
+    position: absolute;
+    right: 0%;
+    width: 350px;
+    z-index: 4;
+}
+
+#Prof-card a {
+    color: grey;
+    font-size: 1.25rem;
+    text-decoration: none;
+}
+
+#prof-card a:hover {
+    color: darkgrey;
+}
+
+@media screen and (max-width: 350px) {
+    #Prof-card {
+        width: 100%;
+        font-size: 3vw;
+    }
+}

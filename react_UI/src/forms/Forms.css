@@ -1,4 +1,64 @@
+.Form-container{
+    position: absolute;
+    width: 60%;
+    left: 20%;
+    text-align: center;
+    z-index: 4;
+}
+
+.Form-header{
+    font-size: 1.5rem;
+    width: fit-content;
+}
+
+.Form-error{
+    margin: 1%;
+    color: red;
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    font-size: 1.25rem;
+}
+
 .Form-input {
-    background-color: black;
-    color: white;
+    padding: 0%;
+}
+
+.Form-submit-btn {
+    margin-bottom: 5px;
+    background-color: green;
+    border-radius: 10px;
+}
+
+#reg-info {
+    align-self: center;
+    font-weight: bold;
+}
+
+.reg-info-text{
+    font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    color: grey;
+}
+
+@media screen and (max-width: 925px){
+    .Form-container{
+        width: 70%;
+        left: 15%;
+    }
+}
+
+@media screen and (max-width: 750px){
+    .Form-container{
+        width: 90%;
+        left: 5%;
+    }
+}
+
+@media screen and (max-width: 520px){
+    .Form-container{
+        width: 100%;
+        left: 0%;
+    }
+
+    #reg-info {
+        display: none;
+    }
 }
