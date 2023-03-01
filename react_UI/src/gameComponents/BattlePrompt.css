@@ -1,0 +1,22 @@
+.Battle-prompt {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    box-shadow: 0 0 20px rgb(71, 71, 71);
+    border-radius: 20px;
+    z-index: 3;
+}
+
+.Battle-prompt button {
+    background-color: green;
+    border-radius: 10px;
+    margin-bottom: 5px;
+    font-size: 1.25rem;
+}
+
+.Battle-prompt button:hover {
+    background-color: red;
+    font-weight: bold;
+}

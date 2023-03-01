@@ -1,0 +1,22 @@
+.table {
+    height: 90vh;
+}
+
+#Game-table-design {
+    background-image: url('../images/vecteezy_suit-deck-of-playing-cards-on-white-background_5421236.jpg');
+    background-repeat: repeat;
+    background-size: 12vw;
+}
+
+#Game-table-color {
+    background-color: rgba(14, 57, 14, 0.95);
+}
+
+#img-credits {
+    font-size: 1vw;
+    padding: 1%;
+    color: rgba(255, 255, 255, 0.441);
+    position: absolute;
+    right: 3%;
+    bottom: 0%;
+}

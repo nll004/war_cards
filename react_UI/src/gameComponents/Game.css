@@ -1,0 +1,174 @@
+.game-start-btn {
+    background-color: transparent;
+    position: absolute;
+    left: 3%;
+    bottom: 5%;
+    border: 1px solid transparent;
+    border-radius: 20px;
+    z-index: 4;
+}
+
+.game-start-btn:hover{
+    border: 1px solid whitesmoke;
+    background-color: transparent;
+}
+
+@keyframes fade-in-out {
+    from {
+        font-size: 0px;
+        opacity: 0;
+    }
+
+    30% {
+        text-shadow: 1px 0 5px yellow, 0 0 15px rgb(8, 115, 8);
+        font-size: 5rem;
+        opacity: 1;
+    }
+
+    50% {
+        text-shadow: yellow 1px 0 30px, 0 0 5px green;
+        font-size: 5rem;
+        opacity: 1;
+    }
+
+    70% {
+        text-shadow: 1px 0 5px yellow, 0 0 15px rgb(8, 115, 8);
+        font-size: 5rem;
+        opacity: 1;
+    }
+
+    to {
+        font-size: 0px;
+        opacity: 0;
+    }
+}
+
+.Game-alert {
+    position: absolute;
+    left: 0%;
+    top: 0%;
+    background-color: rgba(0, 0, 0, 0.425) ;
+    height: 100%;
+    width: 100%;
+    z-index: 3;
+}
+
+.Game-alert-track {
+    position: absolute;
+    width: 100%;
+    left: 0%;
+    top: 40%;
+}
+
+.Game-alert h5 {
+    color: rgb(45, 45, 45);
+    font-family: fantasy;
+    text-align: center;
+    animation: fade-in-out 3s ease-in-out;
+    animation-iteration-count: 1;
+}
+
+.Battle-btn {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 20px;
+    z-index: 2;
+}
+
+.Battle-btn:hover {
+    border: 1px solid black;
+    box-shadow: 0 0 10px black;
+    font-weight: bold;
+}
+
+/* Playing cards and decks *****************************************/
+
+#Game-container {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+}
+
+/* Decks ==================== */
+.Player-deck {
+    height: 45vh;
+    align-self: self-end;
+    background-color: transparent;
+    margin: 15% ;
+}
+
+/* Players name above deck */
+.Player-deck h2 {
+    width: 100%;
+    font-size: 2.25vw;
+    color: whitesmoke;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
+
+#p1 h2 {
+    text-align: right;
+}
+
+/* Number of cards in deck */
+.Player-deck h3 {
+    width: 100%;
+    margin-top: 5%;
+    color: whitesmoke;
+    font-size: 2.5rem;
+    text-align: right;
+}
+
+#p1 h3 {
+    text-align: left;
+}
+
+
+/* Card back img for deck */
+.Player-deck img {
+    height: 100%;
+    width: 100%;
+    border: 1px solid black;
+    border-radius: 10px;
+}
+
+#p1 img:hover{
+    cursor: pointer;
+    border: 2px solid black;
+}
+
+/* Columns for placing played cards */
+
+#p2-card-col, #p1-card-col {
+    height: 80vh;
+    position: relative;
+    top: 3%;
+    margin: 0;
+    padding: 10%;
+}
+
+#p2-card-col img, #p1-card-col img {
+    position: absolute;
+}
+
+#p2-card-col img{
+    left: 20%;
+}
+
+.Drawn-card {
+    background-color: transparent;
+    border: 1px solid black;
+    border-radius: 10px;
+    height: 40vh;
+}
+
+.face-down-card {
+    position: absolute;
+    height: 45%;
+}

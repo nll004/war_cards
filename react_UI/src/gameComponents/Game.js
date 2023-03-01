@@ -1,13 +1,17 @@
 import React, {useState, useEffect} from "react";
+import {Button} from "reactstrap";
 import BattlePrompt from "./BattlePrompt";
 import GameTable from "./GameTable";
 import GameAlert from "./GameAlert";
+import PlayingDeck from "./PlayingDeck";
+import DrawnCard from "./DrawnCard";
+import getAngle from "./GetAngle";
 import CardsApi from "../apis/CardsApi";
 import { WarApi } from "../apis/WarAPI";
-// import "./Game.css";
+import "./Game.css";
 
-const DELAY = (process.env.NODE_ENV === 'test') ? 0 : 3000;
-const ALERT_DELAY = (process.env.NODE_ENV === 'test') ? 0 : 4000;
+const DELAY = (process.env.NODE_ENV === 'test') ? 0 : 2500;
+const ALERT_DELAY = (process.env.NODE_ENV === 'test') ? 0 : 2800;
 
 const DECK_KEY = 'Y3h5na938qb45';
 const P1_KEY= '8ie284-sha9eth1';
@@ -61,17 +65,22 @@ function Game( {currentUser} ){
         localStorage.setItem(DECK_KEY, JSON.stringify(deck));
     }, [p2DrawnCards, showBattleBtn, stats]);
 
-    useEffect(()=> {        // compare p1 and p2 cards 3s after p2 draws
-        if (cardsAreInPlay) setTimeout(()=> checkCardsForWinner(), DELAY);
+    useEffect(()=> {        // compare p1 and p2 cards after timeout
+        if (cardsAreInPlay) {
+            const winner = checkCardsForWinner();
+            if(winner) setTimeout(()=> winsHand(winner), DELAY);
+        };
     }, [cardsAreInPlay]);
 
-    useEffect(()=>{
+    useEffect(()=>{         // remove alert after timeout
         if(alert.message) setTimeout(()=> setAlert({message: null}), ALERT_DELAY);
     }, [alert])
 
     /** Get new shuffled deck to split between players */
     async function startNewGame(){
         const cards = await CardsApi.startGame();
+        cards.map(card=> card.angle = getAngle());
+
         const middleIndex = Math.ceil(cards.length / 2);
         setDeck({   p1: cards.slice(0, middleIndex),
                     p2: cards.slice(-middleIndex)
@@ -123,6 +132,7 @@ function Game( {currentUser} ){
         if (deck.p2.length === 0) gameOver('p1');
 
         setCardsInPlay(false);
+        setActiveBattle(false);
     };
 
     function checkCardsForWinner(){
@@ -132,28 +142,34 @@ function Game( {currentUser} ){
 
         if (p1Card[0].value === p2Card[0].value){
             // if one of the players has no cards in deck to battle, they lose
-            if (deck.p1.length === 0) return winsHand('p2');
-            if (deck.p2.length === 0) return winsHand('p1');
+            if (deck.p1.length === 0) return 'p2';
+            if (deck.p2.length === 0) return 'p1';
 
             setAlert({message: `Card Battle!`})
             setShowBattleBtn(true);
         }
         else if (p1Card[0].value === "2" && p2Card[0].value === "ACE") {
-            if(activeBattle) setStats(prev => ({ ...prev, battlesWon: prev.battlesWon + 1 }));
+            if(activeBattle) {
+                console.log("active battle", activeBattle," add one to battlesWon", stats)
+                setStats(prev => ({ ...prev, battlesWon: prev.battlesWon + 1 }));
+            }
             setAlert({message: "Major win!!"})
-            winsHand('p1');
-        }
-        else if (CARD_RANKS[p1Card[0].value] > CARD_RANKS[p2Card[0].value]) {
-            if (activeBattle) setStats(prev => ({ ...prev, battlesWon: prev.battlesWon + 1 }));
-            winsHand('p1');
+            return 'p1';
         }
         else if (p2Card[0].value === "2" && p1Card[0].value === "ACE") {
             setAlert({ message: "Ouch.. that one really stings" })
-            winsHand('p2');
-        } else {
-            winsHand('p2');
+            return 'p2';
         }
-        setActiveBattle(false);
+        else if (CARD_RANKS[p1Card[0].value] > CARD_RANKS[p2Card[0].value]) {
+            if (activeBattle) {
+                console.log("active battle- add one to battlesWon", stats)
+                setStats(prev => ({ ...prev, battlesWon: prev.battlesWon + 1 }));
+            }
+            return 'p1';
+        }
+        else {
+            return 'p2';
+        }
     };
 
     function battle(drawAmt){
@@ -173,17 +189,18 @@ function Game( {currentUser} ){
     /** Sends game stats to API  */
     function gameOver(player) {
         if (player === 'p1') {
-            setAlert({message: "You may have lost some battles but you won the WAR!"});
-            setStats(prev => ({ ...prev, gamesWon: 1 }));
+            setStats(prev => ({ ...prev, gamesWon: prev.gamesWon + 1 }));
+            setAlert({message: "You lost some battles but won the WAR!"});
+            console.log('stats changed?', stats)
         };
         if (player === 'p2') {
-            setAlert({ message: "Sorry.. You can't win them all." });
-            setStats(prev => ({ ...prev, gamesWon: 0 }));
+            setAlert({ message: "You can't win them all." });
         }
         setDeck({ p1: null, p2: null });
 
         // If logged in, send game stats to API
         try{
+            console.log(stats)
             if(currentUser) WarApi.editUserStats(currentUser.username, stats);
         }catch (error){
             console.error(`Failed to update user stats: ${error}`);
@@ -194,56 +211,55 @@ function Game( {currentUser} ){
         <>
             <GameTable />
 
-            {alert && <GameAlert message={alert.message} />}
+            {alert && alert.message && <GameAlert message={alert.message} />}
 
-            <button onClick={startNewGame}
-                    className='game-start-btn btn'>
+            <Button onClick={startNewGame} color='success' className='game-start-btn'>
                 {(endGame || (deck && (!deck.p1 || !deck.p2)))? "New Game" : "Restart"}
-            </button>
+            </Button>
 
-            <section id='container'>
-                <div id="p2-deck">
-                    {deck && deck.p2 && <>
-                        <div className="card">
-                            <img src={require('../images/card.jpg')} alt='Back of playing card'></img>
-                        </div>
-                        <h2> <span> {deck.p2.length} </span>
-                            Computer
-                        </h2>
-                    </>}
+            {showBattleBtn && !battlePrompt &&
+                <Button onClick={() => setBattlePrompt(true)}
+                        color='warning'
+                        size='lg'
+                        className="Battle-btn">
+                    Battle
+                </Button>}
+
+            {battlePrompt && showBattleBtn &&
+                <BattlePrompt battle={battle} deck={deck} draw={p1DrawCard} />}
+
+            <section id='Game-container'>
+                {deck && deck.p2 &&
+                    <PlayingDeck player={"Computer"} deck={deck.p2} />}
+
+                <div id='p2-card-col'>
+                    {p2DrawnCards && p2DrawnCards.map((c, i) =>
+                        <DrawnCard  card={c}
+                                    key={c.code}
+                                    offset={i}
+                                    player="Computer"
+                                    {...(activeBattle && {position: "50%"}) }/>
+                    )}
                 </div>
 
-                <div id='p2-card-container'>
-                    <ul>
-                        {p2DrawnCards && p2DrawnCards.map((c) => (c.flipped) ? <p>Card: {c.code}</p> : <p>Blank</p>)}
-                    </ul>
+                <div id="p1-card-col">
+                    {p1DrawnCards &&
+                        p1DrawnCards.map((c, i) =>
+                            <DrawnCard  card={c}
+                                        key={c.code}
+                                        offset={i}
+                                        player="Player 1"
+                                        {...(activeBattle && { position: "50%" })} />
+                    )}
                 </div>
 
-                <div id="p1-card-container">
-                    <ul>
-                        {p1DrawnCards && p1DrawnCards.map((c) => (c.flipped) ? <p>Card: {c.code}</p> : <p>Blank</p>)}
-                    </ul>
-                </div>
-
-                <div id="p1-deck">
-                    <h1 className="heading p1-heading">
-                        {(currentUser) ? currentUser.username : "Guest"}
-                        {deck && deck.p1 && <span> {deck.p1.length} </span>}
-                    </h1>
-                    {deck && deck.p1 &&
-                        <div className="card"
-                            /** conditionally applying onclick to card, if no cards already in play you can draw */
-                            {...(!cardsAreInPlay && !showBattleBtn && { onClick: p1DrawCard })}>
-                            <img src={require('../images/card.jpg')} alt='Back of playing card'></img>
-                        </div>
-                    }
-                </div>
+                {deck && deck.p1 &&
+                    <PlayingDeck deck={deck.p1}
+                                 id='p1'
+                                 {...((!cardsAreInPlay && !showBattleBtn)? {draw: p1DrawCard} : null )}
+                        />
+                }
             </section>
-
-
-
-            {showBattleBtn && !battlePrompt && <button onClick={()=>setBattlePrompt(true)}> Battle </button>}
-            {battlePrompt && showBattleBtn && <BattlePrompt battle={battle} deck={deck} draw={p1DrawCard}/>}
         </>
     )
 }
