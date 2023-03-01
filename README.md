@@ -1,7 +1,7 @@
 # Card War Game
-War the card game that fetches cards from the [Cards API](https://www.deckofcardsapi.com/). This project consists of the [React frontend](https://github.com/nll004/war_cards/tree/main/react_UI) and an [Express.js API](https://github.com/nll004/war_cards/tree/main/node_API) that I built to handle CRUD operations for users and game stats. 
+I implemented War the card game, fetching cards from the [Cards API](https://www.deckofcardsapi.com/). This project consists of the [React frontend](https://github.com/nll004/war_cards/tree/main/react_UI) and an [Express.js API](https://github.com/nll004/war_cards/tree/main/node_API) that I built to handle CRUD operations for users and game stats. 
 
-Try [WAR](https://war-battle.surge.sh/)
+Try [WAR](https://war-battle.surge.sh/) out.
 
 ## Features
 - Create new user
