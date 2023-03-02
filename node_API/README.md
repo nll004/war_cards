@@ -14,6 +14,10 @@ This API was developed to support my implementation of the [WAR](https://github.
 
 ## API Routes
 
+### Base Url
+
+    https://war.herokuapp.com/
+
 ### Register new user and get token
 
     POST /user/register
