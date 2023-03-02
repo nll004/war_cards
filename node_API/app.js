@@ -13,7 +13,13 @@ const editUserStatsSchema = require('./jsonSchemas/editUserStats.json');
 const { authenticateJWT, ensureLoggedIn, ensureCorrectUserOrAdmin } = require('./middleware/auths');
 const { BadRequestError, UnauthorizedError } = require('./expressErrors');
 
-app.use(cors());
+
+const corsOptions ={
+    origin:'*',
+    credentials:true,            //access-control-allow-credentials:true
+    optionSuccessStatus:200,
+ }
+app.use(cors(corsOptions));
 
 // Parse request bodies for JSON
 app.use(express.json());

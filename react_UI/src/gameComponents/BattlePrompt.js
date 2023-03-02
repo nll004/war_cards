@@ -48,7 +48,7 @@ function BattlePrompt({battle, deck, draw}){
                     How many cards would you like to risk in this battle?
                 </h3>
 
-                {errors && <p className="Form-error">{errors}</p>}
+                {errors && <p className="Form-error"> {errors} </p>}
 
                 <FormGroup row>
                     <Col lg={3} md={3} xs={12}>

@@ -106,4 +106,5 @@ dist
 # VS code settings
 /.vscode
 
-/React_UI
+/react_UI/build
+/react_UI/.vscode

@@ -74,7 +74,13 @@ function Game( {currentUser} ){
 
     useEffect(()=>{         // remove alert after timeout
         if(alert.message) setTimeout(()=> setAlert({message: null}), ALERT_DELAY);
-    }, [alert])
+    }, [alert]);
+
+    useEffect(()=> {        // send stats to API if logged in user
+        if(endGame && currentUser){
+            WarApi.editUserStats(currentUser.username, stats)
+        }
+    }, [endGame])
 
     /** Get new shuffled deck to split between players */
     async function startNewGame(){
@@ -161,10 +167,7 @@ function Game( {currentUser} ){
             return 'p2';
         }
         else if (CARD_RANKS[p1Card[0].value] > CARD_RANKS[p2Card[0].value]) {
-            if (activeBattle) {
-                console.log("active battle- add one to battlesWon", stats)
-                setStats(prev => ({ ...prev, battlesWon: prev.battlesWon + 1 }));
-            }
+            if (activeBattle) setStats(prev => ({ ...prev, battlesWon: prev.battlesWon + 1 }));
             return 'p1';
         }
         else {
@@ -189,22 +192,14 @@ function Game( {currentUser} ){
     /** Sends game stats to API  */
     function gameOver(player) {
         if (player === 'p1') {
-            setStats(prev => ({ ...prev, gamesWon: prev.gamesWon + 1 }));
-            setAlert({message: "You lost some battles but won the WAR!"});
-            console.log('stats changed?', stats)
+            setStats(prev => ({ ...prev, gamesWon: 1 }));
+            setAlert({ message: "You win!" });
         };
         if (player === 'p2') {
             setAlert({ message: "You can't win them all." });
         }
         setDeck({ p1: null, p2: null });
-
-        // If logged in, send game stats to API
-        try{
-            console.log(stats)
-            if(currentUser) WarApi.editUserStats(currentUser.username, stats);
-        }catch (error){
-            console.error(`Failed to update user stats: ${error}`);
-        };
+        setEndGame(true);
     };
 
     return (
