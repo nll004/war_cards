@@ -22,54 +22,93 @@ This API was developed to support my implementation of the [WAR](https://github.
 
     POST /user/register
 
-**Requires:**
-
-Body - {username, password, firstName, lastName, email}
+**Requires:** - Request Body 
+``` 
+{
+    username, 
+    password, 
+    firstName, 
+    lastName, 
+    email
+}
+```
 
 **Returns:** 
-
-{ user: { username, firstName, lastName, email }, _token, success } or { error }
-
-Route checks for existing username/email and hashes password before storing new user. Returns a success boolean, user data (minus password) and a JWT with expiration value, admin boolean and username.
+```
+{ 
+    user: { 
+        username, 
+        firstName, 
+        lastName, 
+        email 
+        }, 
+    _token, 
+    success 
+} 
+```
+Checks for existing username/email and hashes password before storing new user. Returns a success boolean, user data (minus password) and a JWT with expiration value, admin boolean and username or an error.
 
 ### User login and get token
 
     POST /user/login
 
-**Requires:**
-
-Body - {username, password}
-
+**Requires:** - Request Body 
+```
+{
+    username, 
+    password
+}
+```
 **Returns:** 
-
-{ success, user: { username, firstName, lastName, email }, _token } or { error }
-
-Route checks username and password against hashed password. If username/password combination is correct, returns a success boolean, user data (minus password) and a JWT with expiration value, admin boolean and username
+```
+{ 
+    user: { 
+        username, 
+        firstName, 
+        lastName, 
+        email 
+       }, 
+    success, 
+    _token 
+}
+```
+Checks username and password against hashed password. If username/password combination is correct, returns a success boolean, user data (minus password) and a JWT with expiration value, admin boolean and username vs an error.
 
 ### Get user info
 
     GET /user/:username
 
-**Requires:**
-
-Headers - authorization: "Bearer tokenString"
-
+**Requires:** - Headers
+```
+{
+    authorization: "Bearer <tokenString"
+}
+```
 **Returns**: 
-
-{ success, user: { username, firstName, lastName, email }, _token } or { error }
-
-If token is provided correctly and validated, returns a success boolean and user data (minus password)
+```
+{ 
+    user: { 
+        username, 
+        firstName, 
+        lastName, 
+        email 
+       }, 
+    success, 
+    _token 
+}
+``` 
+If token is provided correctly and validated, returns a success boolean and user data (minus password) or { error }
 
 ### Edit user info
 
     PATCH /user/:username
 
-**Requires:**
-
-Headers - authorization: "Bearer tokenString"
-
-Body - 
-
+**Requires:** - Headers and Request Body
+```
+{
+    authorization: "Bearer <tokenString"
+}
+```
 { username, password, firstName, lastName, email, isAdmin } - Can include any
 
 Only admin users can alter admin status of other users.
