@@ -81,7 +81,7 @@ Checks username and password against hashed password. If username/password combi
 **Requires:** - Headers
 ```
 {
-    authorization: "Bearer <tokenString"
+    authorization: "Bearer <tokenString>"
 }
 ```
 **Returns**: 
@@ -104,63 +104,115 @@ If token is provided correctly and validated, returns a success boolean and user
     PATCH /user/:username
 
 **Requires:** - Headers and Request Body
+
+*Headers*
 ```
 {
-    authorization: "Bearer <tokenString"
+    authorization: "Bearer <tokenString>"
 }
 ```
-{ username, password, firstName, lastName, email, isAdmin } - Can include any
-
+*Request Body* - can include any of the following
+```
+{
+    username, 
+    password, 
+    firstName, 
+    lastName, 
+    email, 
+    isAdmin 
+} 
+```
 Only admin users can alter admin status of other users.
 
 **Returns** 
-
-{ success, modified : {username} } vs { error }
-
+```
+{ 
+    success, 
+    modified : {
+                  username
+                }
+}
+```
 If token is validated and user has permissions to make changes, route checks if the provided email already exists before making changes and hashes any new password before storing the edited information. Returns a success boolean and modified object with user's username.
 
 ### Delete user
 
     DELETE /user/:username
 
-**Requires:**
+**Requires:** - Headers
 
-Headers - authorization: "Bearer tokenString"
-
+*Headers* 
+```
+{
+    authorization: "Bearer <tokenString>"
+}
+```
 **Returns**: 
-
-{ success, deleted: { username } } or { error }
-
+```
+{ 
+    success, 
+    deleted: { 
+                username 
+             } 
+}
+```
 If token is provided correctly and validated, returns a success boolean and deleted object with user's username
 
 ### Get user stats
 
     GET /user/:username/stats
 
-**Requires:**
-
-Headers - authorization: "Bearer tokenString"
-
+**Requires:** - Headers
+```
+{
+    authorization: "Bearer <tokenString>"
+}
+```
 **Returns**: 
-
-{ success, gameStats: { username, gamesPlayed, gamesWon, battles, battlesWon } } or { error }
-
+```
+{ 
+    success, 
+    gameStats: { 
+                  username, 
+                  gamesPlayed, 
+                  gamesWon, 
+                  battles, 
+                  battlesWon 
+                } 
+}
+```
 Route validates token and if user has permissions to retrieve user. Returns success boolean and gameStats object if successful.
 
 ### Edit user stats
 
     PATCH /user/:username/stats
 
-**Requires:**
+**Requires:** - Headers and Request Body
 
-Headers - authorization: "Bearer tokenString"
-
-Body - { gamesPlayed: 1, gamesWon: 0 or 1, battles: >0, battlesWon: > or = to battles }- Must include all properties as described with no additional properties
-
+*Headers* 
+```
+{
+    authorization: "Bearer <tokenString>"
+}
+```
+*Request Body* - Must include all properties as described with no additional properties
+```
+{ 
+    gamesPlayed: 1, 
+    gamesWon: 0 or 1, 
+    battles: >0, 
+    battlesWon: (> or = to battles) 
+}
+```
 **Returns**: 
-
-{ success, modified: { username : 'usersName' } or { error }
-
+```
+{ 
+    success, 
+    modified: { 
+                username 
+              } 
+}
+```
 Route validates token and if the user has permissions to edit stats. Then increments existing stats by the amount received via request before restoring in database.
 
 <br>
