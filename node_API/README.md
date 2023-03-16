@@ -2,6 +2,19 @@
 
 This API was developed to support my implementation of the [WAR](https://github.com/nll004/war_cards) cards game. It provides CRUD operations for users as well as retrieving and updating game stats for users.
 
+## Directory
+- [Technologies](#technologies-used)
+- [API Routes](#api-routes)
+    - [Base Url](#base-url)
+    - [Register User](#register-new-user-and-get-token)
+    - [User login](#user-login-and-get-token)
+    - [Get User Data](#get-user-info)
+    - [Edit User Data](#edit-user-info)
+    - [Delete User](#delete-user)
+    - [Get User Stats](#get-user-stats)
+    - [Edit User Stats](#edit-user-stats)
+- [Scripts](#scripts)
+
 ### Technologies Used
 - Node.js
 - Express.js
