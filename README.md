@@ -14,7 +14,7 @@ I implemented War the card game, fetching cards from the [Cards API](https://www
 ## Features
 
 ### Game Play
-Play as logged in player or guest. Care to try [WAR](https://war-battle.surge.sh/) out.
+Play as logged in player or guest. 
 
 https://user-images.githubusercontent.com/96667141/222455927-ddfb71bb-0f3d-4e25-b48b-c71253cb2846.mp4
 
